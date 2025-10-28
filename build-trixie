@@ -777,7 +777,7 @@ mv chroot/tmp/tmpapt/boot/config-* $kernel/boot/
 rm -fr chroot/tmp/*
 echo
 
-# Download extra squashfs modules if DE config is set
+# Extract extra squashfs modules if DE config is set
 echo -e "\e[0;36mIf configured, extract extra .squashfs modules...\033[0m"
 
 [ "$DE_CONFIG" = "Xfce4" ] && unsquashfs -f -d chroot ../modules-trixie/xfce4//*.squashfs 
