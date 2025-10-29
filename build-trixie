@@ -2,7 +2,7 @@
 # fredx181, 2025-10-27, stripped down version of mklive-trixie
 # supports only .conf files as an argument, e.g. ./build-trixie /path/to/myconfig.conf
 # no dependency on yad (as this has no GUI), no dependency on files to download from the 'MakeLive' repository.
-# 2025-10-29, surround some more variables with double quotes (e.g. "$LAUNCHDIR")  
+# 2025-10-29, surround some more variables with double quotes ( e.g. "$LAUNCHDIR")  
 
 # below uncommented will enable the snapshot repository, comment out to disable
 export SNAPSHOT="deb http://snapshot.debian.org/archive/debian/20240823 trixie main"
