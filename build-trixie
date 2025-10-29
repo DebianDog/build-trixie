@@ -1,7 +1,8 @@
 #!/bin/bash
 # fredx181, 2025-10-27, stripped down version of mklive-trixie
 # supports only .conf files as an argument, e.g. ./build-trixie /path/to/myconfig.conf
-# no dependency on yad (as this has no GUI), no dependency on files to download from the 'MakeLive' repository.  
+# no dependency on yad (as this has no GUI), no dependency on files to download from the 'MakeLive' repository.
+# 2025-10-29, surround some more variables with double quotes (e.g. "$LAUNCHDIR")  
 
 # below uncommented will enable the snapshot repository, comment out to disable
 export SNAPSHOT="deb http://snapshot.debian.org/archive/debian/20240823 trixie main"
@@ -47,21 +48,21 @@ exitfn () {
     trap SIGINT              # Resore signal handling for SIGINT
 echo -e "\e[0;36mUnmounting mount binds in chroot\033[0m"
 #umount -l chroot/tmp
-umount -l $LAUNCHDIR/trixie/chroot/proc 2> /dev/null
-umount -l $LAUNCHDIR/trixie/chroot/sys 2> /dev/null
-umount -l $LAUNCHDIR/trixie/chroot/dev/pts 2> /dev/null
-umount -l $LAUNCHDIR/trixie/chroot/dev 2> /dev/null
+umount -l "$LAUNCHDIR"/trixie/chroot/proc 2> /dev/null
+umount -l "$LAUNCHDIR"/trixie/chroot/sys 2> /dev/null
+umount -l "$LAUNCHDIR"/trixie/chroot/dev/pts 2> /dev/null
+umount -l "$LAUNCHDIR"/trixie/chroot/dev 2> /dev/null
 
-[ ! -d $LAUNCHDIR/trixie/apt ] && mv -f $LAUNCHDIR/trixie/chroot/var/cache/apt $LAUNCHDIR/trixie/
-rm -f $LAUNCHDIR/trixie/apt/archives/lock 2> /dev/null
+[ ! -d "$LAUNCHDIR"/trixie/apt ] && mv -f "$LAUNCHDIR"/trixie/chroot/var/cache/apt "$LAUNCHDIR"/trixie/
+rm -f "$LAUNCHDIR"/trixie/apt/archives/lock 2> /dev/null
    sleep 2
-   if mountpoint -q $LAUNCHDIR/trixie/chroot/dev; then     # just in case check dev
+   if mountpoint -q "$LAUNCHDIR"/trixie/chroot/dev; then     # just in case check dev
    echo -e "\e[0;31mSomething went wrong, directory chroot cannot be removed\033[0m"
    echo -e "\e[0;31mMake sure it's not in use by some process and try again, exiting...\033[0m"
    sleep 2
    exit
    else
-   rm -rf $LAUNCHDIR/trixie/chroot
+   rm -rf "$LAUNCHDIR"/trixie/chroot
    fi
 exit
 }
