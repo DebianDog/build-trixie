@@ -1,0 +1,4 @@
+Before running ./build-trixie, add here extra .deb package(s) that you want to be installed.
+(at the end of the install process, when running inside the chroot).
+Note: will probably give prompt: Continue? [Y/n] to confirm.
+

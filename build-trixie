@@ -4,6 +4,8 @@
 # no dependency on yad (as this has no GUI), no dependency on files to download from the 'MakeLive' repository.
 # 2025-10-29, surround some more variables with double quotes ( e.g. "$LAUNCHDIR")  
 # 2025-10-29, Copy contents (if exist) of 'rootcopy' directory, see ReadMe inside
+# 2025-10-29, Install .deb packages if placed in 'debs' directory, see ReadMe inside
+# these will be installed at the end of the general install process in chroot
 
 # below uncommented will enable the snapshot repository, comment out to disable
 export SNAPSHOT="deb http://snapshot.debian.org/archive/debian/20240823 trixie main"
@@ -364,6 +366,10 @@ echo -e "\e[0;36mCopy initrd skeleton, required for porteus-boot, to chroot/tmp 
 cp -af initrdport-bullseye chroot/tmp/  # copy initrd skeleton to chroot/tmp/
 ok_or_failed
 
+echo -e "\e[0;36mCopy .deb packages from ../debs (if existing) to chroot/tmp/...\033[0m"
+echo -e "\e[0;36mTo be installed at the end of the general install process\033[0m"
+find ../debs -name *.deb -exec cp -af "{}" chroot/tmp/ \; 2> /dev/null
+
 # mount bind some required directories from host filesystem
 mount --bind /proc chroot/proc
 #mount --bind /tmp chroot/tmp
@@ -614,6 +620,11 @@ apt-get install -y eudev porteusbootscripts
 else
 apt-get install -y porteusbootscripts
 fi
+
+# install .deb packages if existing in /tmp/
+echo -e "\e[0;36mInstall .deb package(s) if existing in /tmp/...\033[0m"
+apt install /tmp/*.deb 2> /dev/null
+rm -f /tmp/*.deb 2> /dev/null
 
 ### install the kernel
 echo -e "\e[0;36mInstall the kernel, download and extract\033[0m"
