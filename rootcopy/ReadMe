@@ -1,0 +1,6 @@
+Folders/files that you add here will be copied to the chroot, just before creating 01-filesystem.squashfs.
+Before running ./build-trixie , create a folder structure e.g. usr/bin/ , usr/local/bin , usr/share/ or root/ with file(s) inside.
+
+Note: existing files in chroot will be overwritten by these !
+So this can also be used to replace files in the system.
+

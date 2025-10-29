@@ -3,6 +3,7 @@
 # supports only .conf files as an argument, e.g. ./build-trixie /path/to/myconfig.conf
 # no dependency on yad (as this has no GUI), no dependency on files to download from the 'MakeLive' repository.
 # 2025-10-29, surround some more variables with double quotes ( e.g. "$LAUNCHDIR")  
+# 2025-10-29, Copy contents (if exist) of 'rootcopy' directory, see ReadMe inside
 
 # below uncommented will enable the snapshot repository, comment out to disable
 export SNAPSHOT="deb http://snapshot.debian.org/archive/debian/20240823 trixie main"
@@ -791,10 +792,13 @@ echo -e "\e[0;36mIf configured, extract extra .squashfs modules...\033[0m"
 [ "$DE_CONFIG" = "ChromeDog" ] && unsquashfs -f -d chroot ../modules-trixie/chromedog/*.squashfs
 [ "$DE_CONFIG" = "Tint2" ] && unsquashfs -f -d chroot ../modules-trixie/tint2/*.squashfs
 
+echo -e "\e[0;36mCopy contents (if exist) of rootcopy directory...\033[0m"
+find ../rootcopy -mindepth 1 ! -name ReadMe -exec cp -af "{}" chroot/ \; 2> /dev/null
+
 export nmu=""  # no-merged-usr not supported anymore post-bookworm
 
 # Allow the user to makes changes in chroot just before creating filesystem.squashfs 
-echo "At this point you may want to add/edit files in chroot folder"
+echo "At this point you may want to add/edit/delete files in chroot folder"
 echo "Also you can add .squashfs modules in the isodata/live folder, to be included in the ISO"
 read -sp "Press ENTER to continue . . . "
 echo
