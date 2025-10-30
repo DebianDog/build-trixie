@@ -794,7 +794,7 @@ echo
 echo -e "\e[0;36mIf configured, extract extra .squashfs modules...\033[0m"
 
 [ "$DE_CONFIG" = "Xfce4" ] && unsquashfs -f -d chroot ../modules-trixie/xfce4//*.squashfs 
-[ "$DE_CONFIG" = "Jwm" ] && unsquashfs -f -d chroot ../modules-trixie/jwm/*.squashfs
+#[ "$DE_CONFIG" = "Jwm" ] && unsquashfs -f -d chroot ../modules-trixie/jwm/*.squashfs
 [ "$DE_CONFIG" = "Mate" ] && unsquashfs -f -d chroot ../modules-trixie/mate/*.squashfs
 [ "$DE_CONFIG" = "Lxqt" ] && unsquashfs -f -d chroot ../modules-trixie/lxqt/*.squashfs
 [ "$DE_CONFIG" = "Lxqt_Full" ] && unsquashfs -f -d chroot ../modules-trixie/lxqt/*.squashfs
