@@ -6,6 +6,13 @@
 # 2025-10-29, Copy contents (if exist) of 'rootcopy' directory, see ReadMe inside
 # 2025-10-29, Install .deb packages if placed in 'debs' directory, see ReadMe inside
 # these will be installed at the end of the general install process in chroot
+# 2025-11-01, added "apt-get upgrade" at beginning of install process in chroot ...
+# to make sure that some debian packages are replaced by devuan packages
+# devuan has priority (see /etc/apt/preferences.d/99devuan on non-systemd)
+# 2025-11-01, now installing debootstrap_1.0.134devuan2_all.deb ...
+# ... and will create in case of non-systemd a pure devuan base system
+# will avoid overriding later with devuan packages and avoid confusing message 'downgrading ...'
+
 
 # below uncommented will enable the snapshot repository, comment out to disable
 export SNAPSHOT="deb http://snapshot.debian.org/archive/debian/20240823 trixie main"
@@ -317,8 +324,8 @@ if [ $(command -v apt-get 2>/dev/null) ];then
  ok_or_failed
 fi
 
-# install debootstrap deb
-DEBOOTSTRAP=debootstrap_1.0.134_all.deb
+# install debootstrap deb # fredx181 2025-11-01, changed to devuan version
+DEBOOTSTRAP=debootstrap_1.0.134devuan2_all.deb
 
 dpkg -i "$DEBOOTSTRAP"
 
@@ -337,10 +344,15 @@ exit 0
 fi
 
 ########## Set up debootstrap ##########
+# fredx181 2025-11-01, create devuan base system in case of non-systemd
 echo -e "\e[0;36mSetting up debootstrap in trixie/chroot\033[0m"
 echo -e "\e[0;36mThis may take a while...\033[0m"
 mkdir -p trixie/chroot && cd trixie &&
+if [ "$SYSTEMD" = "FALSE" ]; then  # no systemd, devuan
+debootstrap --arch=$ARCH --variant=minbase --include=apt-transport-https,ca-certificates,initscripts,adduser excalibur chroot http://pkgmaster.devuan.org/merged
+else
 debootstrap --arch=$ARCH --variant=minbase --include=apt-transport-https,ca-certificates,initscripts,adduser trixie chroot http://deb.debian.org/debian/
+fi
 ret=$?
 echo $ret
 if [ $ret -ne 0 ]; then
