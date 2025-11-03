@@ -11,8 +11,11 @@
 # devuan has priority (see /etc/apt/preferences.d/99devuan on non-systemd)
 # 2025-11-01, now installing debootstrap_1.0.134devuan2_all.deb ...
 # ... and will create in case of non-systemd a pure devuan base system
-# will avoid overriding later with devuan packages and avoid confusing message 'downgrading ...'
-
+# ... will avoid overriding later with devuan packages and avoid confusing message 'downgrading ...'
+# 2025-11-03, Now support for "xlibre" install (replacement of xorg) NOTE: only for amd64       
+# ... Run with .conf file *-xlibre.conf, e.g ./build-trixie configs-trixie/lxqt-full-xlibre.conf
+# ... removed xserver-xorg-legacy from installing in this script, added now to the configs
+# ... (will be xserver-xlibre-legacy if run with *-xlibre.conf)
 
 # below uncommented will enable the snapshot repository, comment out to disable
 export SNAPSHOT="deb http://snapshot.debian.org/archive/debian/20240823 trixie main"
@@ -164,6 +167,8 @@ usage: ./$(basename $0) <config_file>  (presets are in configs-trixie)\n
 	-help show this help\n
 	Example using one of the preset config files: \n
 	./$(basename $0) configs-trixie/lxqt-full.conf \n
+        Example using preset config file to install xlibre rather than xorg: \n       
+        ./$(basename $0) configs-trixie/lxqt-full-xlibre.conf \n
 	Example with custom config file: \n
 	./$(basename $0) /path/to/my.conf \n
 "
@@ -349,9 +354,9 @@ echo -e "\e[0;36mSetting up debootstrap in trixie/chroot\033[0m"
 echo -e "\e[0;36mThis may take a while...\033[0m"
 mkdir -p trixie/chroot && cd trixie &&
 if [ "$SYSTEMD" = "FALSE" ]; then  # no systemd, devuan
-debootstrap --arch=$ARCH --variant=minbase --include=apt-transport-https,ca-certificates,initscripts,adduser excalibur chroot http://pkgmaster.devuan.org/merged
+debootstrap --arch=$ARCH --variant=minbase --include=curl,apt-transport-https,ca-certificates,initscripts,adduser excalibur chroot http://pkgmaster.devuan.org/merged
 else
-debootstrap --arch=$ARCH --variant=minbase --include=apt-transport-https,ca-certificates,initscripts,adduser trixie chroot http://deb.debian.org/debian/
+debootstrap --arch=$ARCH --variant=minbase --include=curl,apt-transport-https,ca-certificates,initscripts,adduser trixie chroot http://deb.debian.org/debian/
 fi
 ret=$?
 echo $ret
@@ -477,6 +482,30 @@ deb http://deb.debian.org/debian trixie main contrib non-free non-free-firmware
 
 [ "$ARCH" = "amd64" ] && echo "$REPOS64" > /etc/apt/sources.list 
 
+######### Support for xlibre (replacement for xorg) #########
+    if [ "$ARCH" = "amd64" ]; then  # ONLY for amd64
+curl -fsSL https://xlibre-deb.github.io/key.asc | tee /etc/apt/keyrings/xlibre-deb.asc
+chmod a+r /etc/apt/keyrings/xlibre-deb.asc
+if [ "$SYSTEMD" = "FALSE" ]; then
+echo 'Types: deb deb-src
+URIs: https://xlibre-deb.github.io/devuan/
+Suites: excalibur
+Components: main
+Architectures: amd64
+Signed-By: /etc/apt/keyrings/xlibre-deb.asc
+' > /etc/apt/sources.list.d/xlibre-deb.sources
+
+else
+echo 'Types: deb deb-src
+URIs: https://xlibre-deb.github.io/debian/
+Suites: trixie
+Components: main
+Architectures: amd64
+Signed-By: /etc/apt/keyrings/xlibre-deb.asc
+' > /etc/apt/sources.list.d/xlibre-deb.sources
+fi
+    fi
+#######################################################
 
 apt-get update # required, repositories just added
 [ $? -ne 0 ] && apt-get update # try again if failed
@@ -571,10 +600,10 @@ sleep 3
 fi
 
 # Install some basic packages (do not edit, essential!)
-apt-get install dialog live-boot cryptsetup-initramfs menu dbus xserver-xorg-legacy --yes
+apt-get install dialog live-boot cryptsetup-initramfs menu dbus --yes
 # try again if failed
 if [ $? -ne 0 ]; then
-apt-get install live-boot cryptsetup-initramfs menu dbus xserver-xorg-legacy --yes
+apt-get install live-boot cryptsetup-initramfs menu dbus --yes
 	if [ $? -ne 0 ]; then
 	echo -e "\e[0;31mFAILED\033[0m"
 	touch /exit_
