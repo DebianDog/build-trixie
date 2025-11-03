@@ -851,6 +851,15 @@ find ../rootcopy -mindepth 1 ! -name ReadMe -exec cp -af "{}" chroot/ \; 2> /dev
 
 export nmu=""  # no-merged-usr not supported anymore post-bookworm
 
+# Extra commands
+if [ -f "../extra-commands" ]; then
+	echo -e "\e[0;36mExtra commands file exists, moving file to chroot and executing...\033[0m"
+	mv -f ../extra-commands chroot/
+	cd chroot/
+	. extra-commands
+	cd ..
+fi
+
 # Allow the user to makes changes in chroot just before creating filesystem.squashfs 
 echo "At this point you may want to add/edit/delete files in chroot folder"
 echo "Also you can add .squashfs modules in the isodata/live folder, to be included in the ISO"
