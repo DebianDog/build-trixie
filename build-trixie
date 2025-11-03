@@ -171,6 +171,8 @@ usage: ./$(basename $0) <config_file>  (presets are in configs-trixie)\n
         ./$(basename $0) configs-trixie/lxqt-full-xlibre.conf \n
 	Example with custom config file: \n
 	./$(basename $0) /path/to/my.conf \n
+\n
+If a file named "extra-commands" is detected in the same directory as build-trixie, it will be executed right before 01-filesystem.squashfs is created.
 "
 
 params=$@
