@@ -22,5 +22,5 @@ Example using one of the preset config files to install xlibre rather than xorg:
 Example with custom config file:
 ./build-trixie /path/to/my.conf
 
-If a file named "extra-commands" is detected in the same directory as build-trixie, it will be executed right before 01-filesystem.squashfs is created.
+If a file named "extra-commands" is detected in the same directory as build-trixie, it will be executed in the chroot directory right before 01-filesystem.squashfs is created.
 ```
