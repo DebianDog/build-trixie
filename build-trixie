@@ -16,6 +16,7 @@
 # ... Run with .conf file *-xlibre.conf, e.g ./build-trixie configs-trixie/lxqt-full-xlibre.conf
 # ... removed xserver-xorg-legacy from installing in this script, added now to the configs
 # ... (will be xserver-xlibre-legacy if run with *-xlibre.conf)
+# 2025-11-05, install newest devuan-keyring on host before creating debootstrap base system
 
 # below uncommented will enable the snapshot repository, comment out to disable
 export SNAPSHOT="deb http://snapshot.debian.org/archive/debian/20240823 trixie main"
@@ -328,6 +329,9 @@ if [ $(command -v apt-get 2>/dev/null) ];then
  apt-get install wget xz-utils squashfs-tools cpio xorriso isolinux gpgv -y
  ok_or_failed
 fi
+
+# fredx181 2025-11-05, install newest devuan-keyring on host system
+dpkg -i devuan-keyring_2025.08.09_all.deb
 
 # install debootstrap deb # fredx181 2025-11-01, changed to devuan version
 DEBOOTSTRAP=debootstrap_1.0.134devuan2_all.deb
