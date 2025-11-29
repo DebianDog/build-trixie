@@ -17,6 +17,8 @@
 # ... removed xserver-xorg-legacy from installing in this script, added now to the configs
 # ... (will be xserver-xlibre-legacy if run with *-xlibre.conf)
 # 2025-11-05, install newest devuan-keyring on host before creating debootstrap base system
+# 2025-11-29, structure changes in repo, e.g. tar.gz archives are extracted
+# and added support for "extra-commands" script, will run /tmp/chroot/extra-commands
 
 # below uncommented will enable the snapshot repository, comment out to disable
 export SNAPSHOT="deb http://snapshot.debian.org/archive/debian/20240823 trixie main"
@@ -392,6 +394,9 @@ echo -e "\e[0;36mCopy .deb packages from ../debs (if existing) to chroot/tmp/...
 echo -e "\e[0;36mTo be installed at the end of the general install process\033[0m"
 find ../debs -name *.deb -exec cp -af "{}" chroot/tmp/ \; 2> /dev/null
 
+# copy 'extra-commands' script to chroot/tmp to be executed at the end of running in chroot
+cp -a ../extra-commands chroot/tmp/
+
 # mount bind some required directories from host filesystem
 mount --bind /proc chroot/proc
 #mount --bind /tmp chroot/tmp
@@ -727,6 +732,9 @@ if [ "$RUNXTERM" = "TRUE" ]; then
 echo -e "\e[0;36mAs requested, running Xterm now\nDo not forget to close Xterm and all other windows, when done\033[0m"
 xterm
 fi
+
+# finally, run script /tmp/extra-commands
+/tmp/extra-commands
 
 if [ "$KEEPLOCALES" = "FALSE" ]; then
 rm -fr usr/share/locale/*

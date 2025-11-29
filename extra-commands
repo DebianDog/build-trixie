@@ -1,0 +1,12 @@
+#!/bin/bash
+# this will be executed at build time in the chroot
+# by default it does nothing, but you can add commands below, e.g. for install extra packages:
+# apt install <package1> <package2> etc...
+# or remove packages: apt purge <package1> <package2> ...
+# or remove files or directories, e.g. rm /path/to/somefile or rm -r /path/to/somedir
+######## extra commands:
+
+
+
+
+

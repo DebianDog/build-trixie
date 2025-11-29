@@ -1,6 +1,9 @@
 ## build-trixie
 ### Create a Debian trixie minimal live system similar to 'DebianDog'    
 
+#### Update 2025-11-29:    
+Added "extra-commands" script, will run inside chroot, based on the idea of @IdfbAn          
+
 #### Update: Now support for "xlibre" install (replacement of xorg). NOTE: only for amd64      
 Run with .conf file *-xlibre.conf, e.g `./build-trixie configs-trixie/lxqt-full-xlibre.conf`      
 
