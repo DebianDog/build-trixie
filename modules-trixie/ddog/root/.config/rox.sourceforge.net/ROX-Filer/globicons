@@ -1,0 +1,192 @@
+<?xml version="1.0"?>
+<special-files>
+  <rule match="/opt/apps/arcdrop/arcdrop">
+    <icon>/opt/apps/arcdrop/arcdrop.png</icon>
+  </rule>
+  <rule match="/usr/local/bin/conkytoggle.sh">
+    <icon>/usr/share/icons/Faenza/apps/64/utilities-system-monitor.png</icon>
+  </rule>
+  <rule match="/usr/bin/thunar">
+    <icon>/usr/share/icons/hicolor/48x48/apps/org.xfce.thunar.png</icon>
+  </rule>
+  <rule match="/usr/bin/xterm">
+    <icon>/usr/share/icons/Faenza/apps/64/utilities-terminal.png</icon>
+  </rule>
+  <rule match="/root/mtpaint.tar.bz2">
+    <icon>/usr/share/xfe/icons/gnome-theme/package_32x32.png</icon>
+  </rule>
+  <rule match="/usr/local/bin/synaptic-start">
+    <icon>/usr/share/pixmaps/synaptic.png</icon>
+  </rule>
+  <rule match="/root/mtpaint.tar.xz">
+    <icon>/usr/share/xfe/icons/gnome-theme/package_32x32.png</icon>
+  </rule>
+  <rule match="/usr/bin/xfwrite">
+    <icon>/usr/share/pixmaps/xfw.xpm</icon>
+  </rule>
+  <rule match="/root/.config/rox.sourceforge.net/SendTo/.application_x-deb/install-deb-and-dependencies">
+    <icon>/usr/share/pixmaps/debian-logo.png</icon>
+  </rule>
+  <rule match="/opt/apps/h3v/hv3-linux-nightly-08_0203">
+    <icon>/usr/share/pixmaps/www48.png</icon>
+  </rule>
+  <rule match="/opt/bin/gnome-mplayer">
+    <icon>/usr/share/icons/hicolor/48x48/apps/gnome-mplayer.png</icon>
+  </rule>
+  <rule match="/opt/bin/redeb">
+    <icon>/usr/share/icons/hicolor/16x16/actions/package-supported.png</icon>
+  </rule>
+  <rule match="/root/.config/rox.sourceforge.net/SendTo/.inode_directory/install-deb-and-dependencies">
+    <icon>/usr/share/pixmaps/debian-logo.png</icon>
+  </rule>
+  <rule match="/opt/bin/install-dir-debs-and-dependencies">
+    <icon>/usr/share/pixmaps/debian-logo.png</icon>
+  </rule>
+  <rule match="/opt/bin/picdrop">
+    <icon>/usr/share/pixmaps/picdrop.png</icon>
+  </rule>
+  <rule match="/root/.config/rox.sourceforge.net/SendTo/.inode_directory/install-dir-debs-and-dependencies">
+    <icon>/usr/share/pixmaps/debian-logo.png</icon>
+  </rule>
+  <rule match="/root/mtpaint.xz">
+    <icon>/usr/share/xfe/icons/gnome-theme/package_32x32.png</icon>
+  </rule>
+  <rule match="/usr/bin/mtpaint">
+    <icon>/usr/share/pixmaps/mtpaint.png</icon>
+  </rule>
+  <rule match="/live/image/live/install-deb-pkg.desktop">
+    <icon>/usr/share/icons/hicolor/16x16/actions/package-supported.png</icon>
+  </rule>
+  <rule match="/opt/bin/loadsfs">
+    <icon>/usr/share/pixmaps/sfs.png</icon>
+  </rule>
+  <rule match="/usr/bin/iceweasel">
+    <icon>/usr/share/pixmaps/iceweasel.png</icon>
+  </rule>
+  <rule match="/root/.config/rox.sourceforge.net/SendTo/.inode_directory/install-all-deb-pkgs.desktop">
+    <icon>/usr/share/icons/hicolor/16x16/actions/package-supported.png</icon>
+  </rule>
+  <rule match="/usr/bin/leafpad">
+    <icon>/usr/share/icons/Faenza/apps/64/leafpad.png</icon>
+  </rule>
+  <rule match="/usr/local/bin/picdrop">
+    <icon>/usr/share/pixmaps/picdrop.png</icon>
+  </rule>
+  <rule match="/usr/local/bin/remasterdog-start">
+    <icon>/usr/share/pixmaps/application-x-xzm.png</icon>
+  </rule>
+  <rule match="/usr/bin/gpicview">
+    <icon>/usr/share/pixmaps/gpicview.png</icon>
+  </rule>
+  <rule match="/usr/local/bin/loadsfs">
+    <icon>/usr/share/pixmaps/application-x-squashfs2.png</icon>
+  </rule>
+  <rule match="/usr/local/bin/dogradio">
+    <icon>/usr/share/pixmaps/internetradio.png</icon>
+  </rule>
+  <rule match="/opt/bin/set-default-apps.gtk">
+    <icon>/usr/share/pixmaps/set-default-apps.png</icon>
+  </rule>
+  <rule match="/opt/bin/mintpup-install">
+    <icon>/usr/share/pixmaps/install.png</icon>
+  </rule>
+  <rule match="/root/.config/rox.sourceforge.net/SendTo/.application_x-deb/redeb">
+    <icon>/usr/share/xfe/icons/blue-theme/deb_32x32.png</icon>
+  </rule>
+  <rule match="/root/mtpaint.tar.gz">
+    <icon>/usr/share/xfe/icons/gnome-theme/package_32x32.png</icon>
+  </rule>
+  <rule match="/usr/local/bin/debdog-install">
+    <icon>/usr/share/pixmaps/install.png</icon>
+  </rule>
+  <rule match="/root/.config/rox.sourceforge.net/SendTo/.inode_directory/create-deb-from-folder">
+    <icon>/usr/share/xfe/icons/blue-theme/deb_32x32.png</icon>
+  </rule>
+  <rule match="/usr/bin/xfe">
+    <icon>/usr/share/xfe/icons/xfce-theme/xfe.png</icon>
+  </rule>
+  <rule match="/opt/apps/xhippo/usr/bin/xhippo">
+    <icon>/opt/apps/xhippo/usr/share/pixmaps/xhippo.xpm</icon>
+  </rule>
+  <rule match="/opt/bin/mk-save.gtkdlg">
+    <icon>/usr/share/pixmaps/img_102x102.jpeg</icon>
+  </rule>
+  <rule match="/opt/bin/wallpapers.gui">
+    <icon>/usr/share/pixmaps/WallPapers_128x128.jpg</icon>
+  </rule>
+  <rule match="/root/mtpaint.gz">
+    <icon>/usr/share/xfe/icons/gnome-theme/package_32x32.png</icon>
+  </rule>
+  <rule match="/opt/bin/install-deb-and-dependencies">
+    <icon>/usr/share/pixmaps/debian-logo.png</icon>
+  </rule>
+  <rule match="/live/image/ftp/Light-Debian-Core-Test.iso">
+    <icon>/usr/share/pixmaps/optical48.png</icon>
+  </rule>
+  <rule match="/opt/bin/user-modules_2">
+    <icon>/usr/share/pixmaps/keditbookmarks.xpm</icon>
+  </rule>
+  <rule match="/root/.config/rox.sourceforge.net/SendTo/.inode_directory/redeb">
+    <icon>/usr/share/icons/hicolor/16x16/actions/package-supported.png</icon>
+  </rule>
+  <rule match="/root/.config/rox.sourceforge.net/SendTo/.inode_directory/install-all-deb-from-folder">
+    <icon>/usr/share/icons/hicolor/16x16/actions/package-supported.png</icon>
+  </rule>
+  <rule match="/opt/bin/gmplayer">
+    <icon>/usr/share/pixmaps/mplayer48.png</icon>
+  </rule>
+  <rule match="/root/.config/rox.sourceforge.net/SendTo/.application_x-deb/install-deb-pkg">
+    <icon>/usr/share/icons/hicolor/16x16/actions/package-supported.png</icon>
+  </rule>
+  <rule match="/root/echo.tar">
+    <icon>/usr/share/xfe/icons/gnome-theme/package_32x32.png</icon>
+  </rule>
+  <rule match="/usr/local/bin/mk-save.gtkdlg">
+    <icon>/usr/share/icons/Faenza/categories/64/preferences-other.png</icon>
+  </rule>
+  <rule match="/root/.config/rox.sourceforge.net/SendTo/.application_x-deb/install-deb-pkg.desktop">
+    <icon>/usr/share/icons/hicolor/16x16/actions/package-supported.png</icon>
+  </rule>
+  <rule match="/usr/bin/pcmanfm">
+    <icon>/usr/share/icons/Faenza/apps/64/system-file-manager.png</icon>
+  </rule>
+  <rule match="/root/echo.tar.xz">
+    <icon>/usr/share/xfe/icons/gnome-theme/package_32x32.png</icon>
+  </rule>
+  <rule match="/live/image/live/install-all-deb-pkgs.desktop">
+    <icon>/usr/share/icons/hicolor/16x16/actions/package-supported.png</icon>
+  </rule>
+  <rule match="/root/.config/rox.sourceforge.net/SendTo/.application_x-deb/extract-deb-package">
+    <icon>/usr/share/xfe/icons/blue-theme/deb_32x32.png</icon>
+  </rule>
+  <rule match="/usr/bin/searchmonkey">
+    <icon>/usr/share/pixmaps/searchmonkey.xpm</icon>
+  </rule>
+  <rule match="/opt/apps/calculator-fox/bin/calculator_fox">
+    <icon>/usr/share/pixmaps/FoxCalc.png</icon>
+  </rule>
+  <rule match="/usr/bin/galculator">
+    <icon>/usr/share/pixmaps/galculator.png</icon>
+  </rule>
+  <rule match="/usr/bin/firefox">
+    <icon>/usr/share/icons/Faenza/apps/64/web-browser.png</icon>
+  </rule>
+  <rule match="/opt/bin/remasterdog">
+    <icon>/usr/share/pixmaps/hb-icon.png</icon>
+  </rule>
+  <rule match="/usr/local/bin/default_web-browser">
+    <icon>/usr/local/bin/default_web-browser.icon</icon>
+  </rule>
+  <rule match="/usr/bin/xarchiver">
+    <icon>/usr/share/pixmaps/xarchiver.xpm</icon>
+  </rule>
+  <rule match="/live/image/001-new-last-o-x-sudo.squashfs">
+    <icon>/usr/share/xfe/icons/xfe-theme/package_16x16.png</icon>
+  </rule>
+  <rule match="/usr/bin/rox">
+    <icon>/usr/share/rox/images/application.png</icon>
+  </rule>
+  <rule match="/opt/apps/geany/geany">
+    <icon>/usr/share/pixmaps/geany.png</icon>
+  </rule>
+</special-files>

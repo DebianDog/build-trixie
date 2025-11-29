@@ -1,0 +1,83 @@
+
+border.width: 1
+padding.width: 3
+padding.height: 3
+window.handle.width: 0
+window.client.padding.width: 0
+window.client.padding.height: 0
+menu.overlap: -2
+*.justify: center
+
+
+!# Menu settings
+menu.border.color: #E3E3E3
+
+menu.title.bg: solid flat
+menu.title.bg.color: #d2d2d2
+menu.title.text.color: #3c3c3c
+
+menu.items.bg: Flat Solid
+menu.items.bg.color: #E3E3E3
+menu.items.text.color: #3c3c3c
+menu.items.disabled.text.color: #aaaaaa
+
+menu.items.active.bg: Flat Gradient Vertical
+menu.items.active.bg.color: #4F93DA
+menu.items.active.bg.colorTo: #1661B0
+menu.items.active.bg.border.color: #1661B0
+menu.items.active.text.color: #ffffff
+
+menu.separator.width: 1
+menu.separator.padding.width: 0
+menu.separator.padding.height: 3
+menu.separator.color: #E3E3E3
+
+
+!# Windows
+window.*.label.bg: Parentrelative
+window.*.border.color: #aaaaaa
+window.*.handle.bg: Raised solid
+window.*.handle.bg.color: #dadada
+window.*.grip.bg: Raised solid
+window.*.grip.bg.color: #dadada
+window.*.button.*.bg: parentrelative
+window.*.button.*.bg.color: #ffffff
+window.*.button.*.bg.border.color: #aaaaaa
+window.*.button.*.image.color: #4F4F4F
+window.*.button.hover.image.color: #000000
+window.*.button.hover.bg.border.color: #000000
+window.*.button.pressed.image.color: #969696
+window.*.title.separator.color: #d2d2d2
+window.active.title.bg: gradient vertical flat
+window.active.title.bg.color: #CECECE
+window.active.title.bg.colorTo: #CECECE
+window.inactive.title.bg: gradient vertical flat
+window.inactive.title.bg.color: #dedede
+window.inactive.title.bg.colorTo: #d2d2d2
+
+!# Active
+window.active.label.text.color: #3c3c3c
+
+!# inactive
+window.inactive.label.text.color: #999999
+
+
+!# osd
+
+osd.border.width: 2
+osd.border.color:  #CECECE
+
+osd.bg: flat solid
+osd.bg.color: #CECECE
+osd.hilight.bg: flat gradient border
+osd.hilight.bg.color: #4D90FE
+osd.hilight.bg.colorTo: #4787EE
+osd.hilight.bg.border.color: #2D6FD8
+
+osd.unhilight.bg: flat gradient border
+osd.unhilight.bg.color: #f5f5f5
+osd.unhilight.bg.colorTo: #f1f1f1
+osd.unhilight.bg.border.color: #d9d9d9
+
+osd.label.bg: Parentrelative
+osd.label.text.color: #333333

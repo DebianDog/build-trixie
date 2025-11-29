@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<pinboard>
+  <backdrop style="Stretched">/opt/docs/pictures/fisherman.jpg</backdrop>
+  <icon x="32" y="32" label="FileManager">/usr/bin/pcmanfm</icon>
+  <icon x="224" y="128" label="Browse">/usr/local/bin/chrome-puppy.sh</icon>
+  <icon x="416" y="32" label="DogRadio">/usr/local/bin/dogradio</icon>
+  <icon x="320" y="32" label="Installer">/usr/local/bin/debdog-install</icon>
+  <icon x="320" y="128" label="Remaster">/usr/local/bin/remasterdog-start</icon>
+  <icon x="512" y="32" label="CreateSave">/usr/local/bin/mk-save.gtkdlg</icon>
+  <icon x="608" y="32" label="conkytoggle">/usr/local/bin/conkytoggle.sh</icon>
+  <icon x="128" y="128" label="Roxterm">/usr/bin/roxterm</icon>
+  <icon x="128" y="32" label="Mtpaint">/usr/bin/mtpaint</icon>
+  <icon x="224" y="32" label="Synaptic">/usr/local/bin/synaptic-start</icon>
+  <icon x="512" y="128" label="PicDrop">/usr/local/bin/picdrop</icon>
+  <icon x="416" y="128" label="leafpad">/usr/bin/leafpad</icon>
+  <icon x="32" y="128" label="RoxFiler">/usr/share/applications/rox.desktop</icon>
+</pinboard>

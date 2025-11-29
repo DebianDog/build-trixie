@@ -1,0 +1,30 @@
+### Edit Keybind List
+### Format requires delimiter '|' after key sequence, e.g: Alt + F2|Run Dialog
+Alt + K|This Info Dialog
+Alt + F2|Run Dialog
+Ctrl + Alt + Backsp|Exit X
+Alt + Tab|Switch between applications
+Ctrl + Alt + Space|Main Menu
+Ctrl + Alt + K|Keybind Configuration Gui
+Ctrl + Alt + T|Terminal
+Ctrl + Alt + Right|Go to Desktop Next
+Ctrl + Alt + F|File Manager
+Ctrl + Alt + Left|Go to Desktop Previous
+Ctrl + Alt + E|Editor
+Shift + Alt + Right|Send window to Desktop Next
+Ctrl + Alt + M|Media Player
+Shift + Alt + Left|Send window to Desktop Previous
+Ctrl + Alt + W|Web Browser
+PrtSc|Screenshot
+Ctrl + Alt + G|Graphics Editor
+Alt + D|Toggle Show Desktop
+Ctrl + Alt + V|Volume Control
+Ctrl + Alt + S|Save During Session (porteus-boot)
+Ctrl + Alt + P|Package manager
+Ctrl + Alt + R|Radio
+Ctrl + M|Toggle maximize current window 
+Alt + Scroll wheel|Change desktops forward and backward
+Alt + Left mouse|Move a window
+Alt + Right mouse|Resize a window
+Alt + F3|Minimize current window
+Alt + F4|Close current window

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Alsa Equalizer
+Comment=Graphical audio mixer
+Exec=alsaequal
+Icon=/usr/share/pixmaps/alsamixergui.xpm
+Terminal=false
+Type=Application
+Categories=Application;AudioVideo;
+

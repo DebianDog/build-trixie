@@ -1,0 +1,6 @@
+#!/bin/bash
+
+WM=$(wmctrl -m | grep Name: | awk '{ print $2 }')
+if [ "$WM" = "Openbox" ]; then
+/usr/local/bin/keysh
+fi

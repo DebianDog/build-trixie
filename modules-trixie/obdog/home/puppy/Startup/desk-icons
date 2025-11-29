@@ -1,0 +1,23 @@
+#!/bin/bash
+
+ICONPOSCONF=`ls -Art ~/.config/xfce4/desktop/icons.screen0-*  | tail -n 1`
+
+cp -af -T "$ICONPOSCONF" ~/.config/xfce4/desktop/icons.screen0.rc
+
+#mv -f "$ICONPOSCONF" ~/.config/xfce4/desktop/icons.screen0.rc
+
+if [ "$(pidof xfdesktop)" ]; then
+sleep 2
+xfdesktop --reload
+else
+	while [ ! "$(pidof xfdesktop)" ]; do
+	sleep 1
+	  if [ "$(pidof xfdesktop)" ]; then
+	  sleep 2
+	  xfdesktop --reload
+	  break
+	  fi
+	done
+fi
+
+

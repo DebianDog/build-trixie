@@ -1,0 +1,19 @@
+#!/bin/sh
+Thunar --daemon &
+chpupsocket $USER:$USER &
+xfdesktop &
+xfce4-panel &
+sleep 2
+xfce4-clipman &
+sleep 2
+frisbee-tray &
+wait $!
+sleep 1
+if [ -f /mnt/live/tmp/modules ]; then
+conky -c ~/.conkyrc-port &
+else
+conky -c ~/.conkyrc-live &
+fi
+#wait $!
+alsamixertray
+#volumeicon &

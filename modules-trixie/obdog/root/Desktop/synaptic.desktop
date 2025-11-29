@@ -1,0 +1,5 @@
+[Desktop Entry]
+Type=Link
+Name=Install
+Icon=synaptic
+URL=/usr/share/applications/synaptic.desktop

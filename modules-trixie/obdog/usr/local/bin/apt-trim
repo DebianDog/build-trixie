@@ -1,0 +1,139 @@
+#!/bin/bash
+
+if [ -z `which gsu` ]; then
+[ "`whoami`" != "root" ] && exec gksu ${0} "$@"
+else
+[ "`whoami`" != "root" ] && exec gsu ${0} "$@"
+fi
+
+if [ -z `which yad` ]; then
+	msg="  You don't have yad installed.\nIt's a dependency of this program.\nPlease install it."
+	xmessage "`echo -e $msg`"
+exit 0
+fi
+
+if [ -z `which inotifywait` ]; then
+yad --image=gtk-info --button="gtk-quit:0" --title="Dependency check" --text=" This program depends on 'inotifywait'. \n Please install the 'inotify-tools' package. \n With synaptic, or in terminal: \n apt-get install inotify-tools "
+exit 0
+fi
+
+echo -en "\nUsage:\n`basename ${0}` <packagename(s) or: \n`basename ${0}` \n"
+
+term_func() {
+dpkg -s $INSTALL 2> /dev/null
+ret=$?
+if [[ $ret -eq 0 ]]; then
+echo "Info: Package(s) already installed!"
+yad --title Apt-trim --text "    Package(s) already installed!   " --button="gtk-close:0"
+rm -f $INSTALLED
+exit
+fi
+
+# Run inotifywait to check for changes in /usr/share
+inotifywait -mr /usr/share -e create -e moved_to |
+    while read path action file; do
+        #echo "The file '$file' appeared in directory '$path' via '$action'"
+        echo "${path}${file}" >> $INSTALLED
+    done &
+disown
+
+pdnoti="`ps -eo pid,cmd | grep -v grep | grep "inotifywait -mr /usr/share -e create -e moved_to" | awk '{ print $1 }'`"
+
+if [ "$UPDATE" = "TRUE" ]; then
+apt-get update && apt-get install $INSTALL
+sleep 1
+kill $pdnoti
+dpkg -s $INSTALL
+ret=$?
+	if [[ $ret -ne 0 ]]; then
+yad --borders 6 --center --title="apt-trim" --text="    No package was installed.    \n    Please try again.   " --button="gtk-close:0"
+rm -f $INSTALLED
+exit
+	fi
+else
+apt-get install $INSTALL
+sleep 1
+kill $pdnoti
+dpkg -s $INSTALL
+ret=$?
+	if [[ $ret -ne 0 ]]; then
+yad --borders 6 --center --title="apt-trim" --text="    No package was installed.    \n    Please try again.   " --button="gtk-close:0"
+rm -f $INSTALLED
+exit
+	fi
+fi
+
+# Zerosize man and doc files
+TO_ZERO=$(cat $INSTALLED 2> /dev/null  | grep "/usr/share/man/\|/usr/share/doc/\|/usr/share/info/\|/usr/share/gnome/help/\|/usr/share/gtk-doc/" | grep -v "dpkg-tmp\|dpkg-new")
+if [ -n "$TO_ZERO" ]; then
+    echo "Cleaning..."
+    rm -f $TO_ZERO 2> /dev/null
+    touch $TO_ZERO  2> /dev/null
+    chown man:root $TO_ZERO 2> /dev/null
+fi
+sleep 4
+}
+
+export -f term_func
+
+	if [ "$1" = "" ]; then  # If no arguments were provided
+SETUP=`yad --borders=6  --center --title="Apt-trim"  --text=" <b>Trim the fat from package(s) installed by apt-get.</b> \n Any man or doc files installed in /usr/share will be 'zerosized' (0 bytes). \n Also you can choose from a list which locale(s) to keep, \n the others will be removed. \n There will be no choice if a package doesn't include locales." \
+--window-icon="preferences-system" --form --columns=1 \
+--field="   Type packagename(s) separated by a space: :LBL" "" \
+--field=" : " "" \
+--field=" Run 'apt-get update' first (recommended):CHK" "TRUE" \
+ --button="gtk-quit:1" --button="gtk-ok:0"`
+ret=$?
+[[ $ret -ne 0 ]] && exit
+
+export INSTALL="`echo $SETUP | cut -d "|" -f 2`"
+export UPDATE="`echo $SETUP | cut -d "|" -f 3`"
+export INSTALLED=`tempfile 2>/dev/null` || TMPF=/tmp/test$$
+
+if [ -z "$INSTALL" ]; then
+yad --center --title="apt2sfs" --text=" You probably did not fill in all fields, \n Please run again." --button="gtk-close:0"
+rm_func
+exit
+fi
+
+# Run in xterm
+xterm -T "Apt-trim" -si -sb -fg black -bg white -geometry 75x15 -e /bin/bash -c term_func
+
+	else   # If <packagename(s)> was provided
+INSTALL="$@"
+UPDATE="TRUE"
+INSTALLED=`tempfile 2>/dev/null` || TMPF=/tmp/test$$
+term_func
+	fi
+
+LOCALES=$(cat $INSTALLED 2> /dev/null | grep -E "/usr/share/locale/" | grep "LC_MESSAGES/" | grep -v "dpkg-tmp\|dpkg-new")
+if [ -n "$LOCALES" ]; then
+BASELOCALES=$(echo "$LOCALES" | sed -e 's|.*locale/||' -e 's|/.*||' | sort -u)
+
+# Choose wich locales to keep
+KEEP=$(yad --borders 6 --separator=" " --center --height 600 --width="300" --list --title="Remove Locales" --multiple --text=" Remove locales from just installed package(s). \n (if there are any installed). \n Select locale(s) to <b><u>keep</u></b> : \n To keep all, click 'Cancel'." --column " Locales " $BASELOCALES --button="gtk-cancel:1" --button="gtk-ok:0")
+ret=$?
+if [[ $ret -ne 0 ]]; then
+rm -f $INSTALLED
+exit
+fi
+echo "Locales to keep: " $KEEP
+
+# Remove 'locales to keep' from the filelist so these won't be removed afterwards. 
+for i in $KEEP; do
+sed -i "/\/${i}\//d" $INSTALLED
+done
+
+LOCALES=$(cat $INSTALLED | grep -E "/usr/share/locale/" | grep "LC_MESSAGES/" | grep -v "dpkg-tmp\|dpkg-new")
+rm -f $LOCALES
+
+# Remove empty directories in /usr/share/locale/
+find /usr/share/locale/ -depth -type d -empty -exec rmdir '{}' \;
+yad --on-top  --title="Apt-trim" --text=" <b>*** Locales removed... ***</b> \n  (except the one(s) you selected) " --undecorated --no-buttons --timeout 5 &
+fi
+
+# Remove tempfile
+rm -f $INSTALLED
+exit
+
+

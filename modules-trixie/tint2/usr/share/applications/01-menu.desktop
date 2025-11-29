@@ -1,0 +1,15 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Openbox Menu
+Comment=Openbox Menu Hack
+X-GNOME-FullName=Openbox Menu
+Exec=xdotool key ctrl+alt+space
+Terminal=false
+X-MultipleArgs=false
+Type=Application
+Icon=menu
+Categories=Menu;
+MimeType=
+StartupNotify=true
+OnlyShowIn=LXDE
+NoDisplay=true

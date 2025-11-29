@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<JWM>
+<StartupCommand>jwm-obmenu</StartupCommand>
+<RootMenu label="JWM" height="20" onroot="12345">
+
+   <Program icon="/usr/share/pixmaps/term.png" label="Terminal">x-terminal-emulator</Program>
+   <Program icon="/usr/share/icons/Faenza/apps/64/web-browser.png" label="WWW Browser">default_web-browser</Program>       
+
+<Separator/>
+<Menu label="Screenshot" icon="/usr/share/icons/Faenza/devices/64/camera-photo.png" height="16">
+   <Program label="Now">scrot debdog-%Y%m%d%H%M%S.jpg</Program>
+    <Program label="In 5 seconds...">scrot -d 5 debdog-%Y%m%d%H%M%S.jpg</Program>
+     <Program label="In 10 seconds...">scrot -d 10 debdog-%Y%m%d%H%M%S.jpg</Program>
+     <Program label="Selected Area">scrot -s debdog-%Y%m%d%H%M%S.jpg</Program>
+     <Program label="Selected Area in 5 seconds...">scrot -s -d 5 debdog-%Y%m%d%H%M%S.jpg</Program>
+</Menu>
+<Separator/>

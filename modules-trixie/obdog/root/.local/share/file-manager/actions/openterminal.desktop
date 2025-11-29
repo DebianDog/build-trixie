@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Action
+Tooltip=Terminal Here
+Name=Terminal Here
+Profiles=profile-zero;
+Icon=roxterm
+
+[X-Action-Profile profile-zero]
+MimeTypes=inode/directory
+Exec=xdotool key F4
+Name=Default profile

@@ -1,0 +1,601 @@
+#!/bin/bash
+#set -x
+[ "`whoami`" != "root" ] && exec gsu ${0}
+ 
+if [ -z `which yad` ]; then
+	msg="  Cannot continue without yad, please install it."
+	xmessage "`echo -e $msg`"
+exit 0
+fi
+
+if [ -z `which Xdialog` ]; then
+	msg="  Cannot continue without gtkdialog, please install it."
+	xmessage "`echo -e $msg`"
+exit 0
+fi
+
+#this part tests to see if ffmpeg is installed, and if not close the script with an error
+#test_ffmpeg=`which avconv | grep -c "avconv"`
+#if [ "$test_ffmpeg" -eq "0" ]; then
+if [ -z $(which avconv) ] && [ -z $(which ffmpeg) ]; then
+	yad --title="Error" --text="You do not have libav-tools installed.
+	This package is a dependency of this script.
+	Please install libav-tools and try again."
+	exit
+fi
+
+[ $(which avconv) ] && export FFMPEG=avconv
+[ $(which ffmpeg) ] && export FFMPEG=ffmpeg 
+
+test_lame=`which lame | grep -c "lame"`
+if [ "$test_lame" -eq "0" ]; then
+	yad --title="Dependency check" --text="  You do not have lame installed. \n  Please install it to use advanced options for mp3.  " \
+        --button="gtk-close:0"
+fi
+define_format() {
+	if [ "$FORMAT" = "mp3" ]; then 
+		codec="libmp3lame"
+	fi
+        if [ "$FORMAT" = "ogg" ]; then 
+		codec="libvorbis"
+	fi
+        if [ "$FORMAT" = "flac" ]; then 
+		codec="flac"
+	fi
+        if [ "$FORMAT" = "wav" ]; then 
+		codec="pcm_s16le"
+	fi
+        if [ "$FORMAT" = "m4a" ]; then 
+		codec="libfaac"
+	fi
+export codec=$codec
+}
+define_lameopts (){
+	lameopts=`yad --height="400" --width="500" --title="Advanced mp3 settings" --text="Which lame settings would you like to use?
+	" --list --editable --separator="" \
+	--column="Edit & Pick" \
+	 " --alt-preset fast extreme -m s -V 2 --lowpass 20 " \
+	 " --vbr-new " \
+	 " --alt-preset fast extreme " \
+	 " -b 128 -h " \
+	 " -b 192 -h " \
+         " -b 320 -h " `
+
+         if [ ! "$lameopts" ]; then 
+		yad --title="Error" --text="Please choose a setting for the new audio file and try again." 
+		exit
+	fi
+export lameopts=$lameopts
+}
+
+encode_audio (){
+#set -x
+exec_ffmpeg() {
+INFO=$($FFMPEG -i "$1" 2>&1 | grep "Duration\|Audio:\|Video:")
+DUR=$(echo "$INFO" | grep Duration | awk '{print $2}' | tr -d ,)
+DURTIME=$(echo "$DUR" | sed 's/\(.*\).../\1/' | awk -F: '{ print ($1 * 3600) + ($2 * 60) + $3 }')
+aud=$(echo "$INFO" | grep Audio: | awk -F"Audio: " '{print $2}' | awk '{ print $1 }')
+vid=$(echo "$INFO" | grep Video: | awk -F"Video: " '{print $2}' | awk '{ print $1 }')
+ext=$(echo "$INFO" | grep Audio: | awk -F"Audio: " '{print $2}' | awk '{print $1}' | sed -e  's/,//g')
+
+$FFMPEG $ow -i "$1" -vn -acodec "$codec"  -ac "$CHANN" -ar "$FREQ" -ab "${BIT}"k "$DIR/$name.$FORMAT" < /dev/null 2>/tmp/ffmpeg_output &
+
+running(){ ps $1 | grep $1 >/dev/null; }
+
+CPPID=$!
+START=$(date +%s); TODOTIME=0; ETA=0; ELAPSED=0
+trap "kill $CPPID" 2 15
+
+(
+	while running $CPPID; do
+                   LINE=$(tail -2 /tmp/ffmpeg_output | grep 'size=')
+while [ -z "$LINE" ]; do
+sleep 1
+                   LINE=$(tail -2 /tmp/ffmpeg_output | grep 'size=')
+if [ -n "$LINE" ]; then
+                   LINE=$(tail -2 /tmp/ffmpeg_output | grep 'size=')
+break
+fi
+done
+	if [ -L $(which avconv) ] && [ -e /usr/bin/ffmpeg ]; then
+TODO=`echo -ne "\r$LINE"  | sed -e 's/.*time=//' -e 's, .*,,'`
+VSTATS=$(echo "$TODO" | sed 's/\(.*\).../\1/' | awk -F: '{ print ($1 * 3600) + ($2 * 60) + $3 }')
+	else
+VSTATS=`echo -ne "\r$LINE" | sed -e 's/.*time=//' -e 's, .*,,' | sed 's/\(.*\).../\1/'`
+TODO=$(date -u -d @${VSTATS} +%H:%M:%S)
+	fi
+
+    if [ $VSTATS -gt $TODOTIME ]; then                # Parsed sane or not yet?
+        TODOTIME=$VSTATS
+        PERC=$(( 100 * TODOTIME / DURTIME ))     # Progbar calc.
+	#PERC=`echo -e "\e[0;34m${PERC}%\e[0m"`
+        ELAPSED=$(( $(date +%s) - START )); echo $ELAPSED > /tmp/elapsed.value
+        ETA=$(date -d @$(awk 'BEGIN{print int(('$ELAPSED' / '$TODOTIME') *\
+        ('$DURTIME' - '$TODOTIME'))}') -u +%H:%M:%S)   # ETA calc.
+
+    fi
+
+first_second() {
+first=$(echo "${MY_ARR}" | cut -d'|' -f1 | rev | cut -c $l- | rev)
+second=$(echo "${MY_ARR}" | cut -d'|' -f2-)
+second=$(echo "${second:$r}")
+string="$first...$second"
+#echo $string
+#echo num="${#string}"
+}
+
+x="$DIR/$name.$FORMAT"
+y="${#x}"
+#echo $y
+if [ "$y" -gt "130" ] && [ "$y" -le "140" ]; then
+l=27; r=27
+MY_ARR="$(echo "$x" | awk '$0=substr($0,1,48)"|"substr($0,50,length($0))')"
+first_second
+elif [ "$y" -gt "120" ] && [ "$y" -le "130" ]; then
+l=23; r=23
+MY_ARR="$(echo "$x" | awk '$0=substr($0,1,44)"|"substr($0,46,length($0))')"
+first_second
+elif [ "$y" -gt "110" ] && [ "$y" -le "120" ]; then
+l=19; r=19
+MY_ARR="$(echo "$x" | awk '$0=substr($0,1,40)"|"substr($0,42,length($0))')"
+first_second
+elif [ "$y" -gt "100" ] && [ "$y" -le "110" ]; then
+l=15; r=15
+MY_ARR="$(echo "$x" | awk '$0=substr($0,1,36)"|"substr($0,38,length($0))')"
+first_second
+elif [ "$y" -gt "90" ] && [ "$y" -le "100" ]; then
+l=11; r=11
+MY_ARR="$(echo "$x" | awk '$0=substr($0,1,31)"|"substr($0,33,length($0))')"
+first_second
+elif [ "$y" -gt "80" ] && [ "$y" -le "90" ]; then
+l=7; r=7
+MY_ARR="$(echo "$x" | awk '$0=substr($0,1,26)"|"substr($0,28,length($0))')"
+first_second
+elif [ "$y" -gt "140" ]; then
+string="$name.$FORMAT"
+else
+string="$DIR/$name.$FORMAT"
+#echo $string
+fi
+
+echo "XXX"
+echo "Processing $bname..."
+echo "\\n"
+echo "Video codec: $vid    Audio codec: $aud"
+echo "\\n"
+echo "Destination:  $string"
+echo "\\n"
+echo "Video duration time processed:    $TODO/$DUR"
+echo "\\n" 
+echo "Time Elapsed: $(date -d @$ELAPSED -u +%H:%M:%S)                                Time left: $ETA"
+echo "\\n"
+echo "                             Close this Window to Cancel processing."
+echo "XXX"
+      echo $PERC
+    sleep 1
+piddialog="`ps -eo pid,args | grep -v grep | grep 'Xdialog --title Extracting Audio...' | awk '{ print $1 }'`"
+
+if [ -z "$piddialog" ]; then
+sleep 2
+kill "$CPPID"
+rm -f "$DIR/$name.$FORMAT"
+break
+fi
+   done
+if [ "$TODOTIME" = "0" ]; then
+ERR=yes
+piddialog="`ps -eo pid,args | grep -v grep | grep 'Xdialog --title Extracting Audio...' | awk '{ print $1 }'`"
+kill $piddialog
+sleep 1
+errline=$(tail -2 /tmp/ffmpeg_output)
+Xdialog --title "Video2Audio" --msgbox " An error occurred.  \n FFmpeg message: \n $errline  " 0 0
+fi   
+  echo 100
+   sleep 1   
+) | Xdialog --title "Extracting Audio..." --left --gauge " To cancel conversion, Close this window. " 17 120 0
+}
+	      
+
+	      DIR="$(dirname "$1")"
+              name=$(basename "$1" |sed 's/\(.*\)\..*/\1/')
+	      bname=$(basename "$1")
+
+if [ -f "$DIR/$name"."$FORMAT" ]; then
+yad --title "File exists" --width=600 --text "  File $DIR/$name.$FORMAT already exists.  \n     Overwrite?" --button="gtk-yes:0" --button="gtk-no:1"
+ret=$?
+if [[ $ret -ne 0 ]]; then
+:
+else
+ow="-y"
+exec_ffmpeg "$1"
+fi
+else
+exec_ffmpeg "$1"
+fi
+}
+
+encode_mp3adv (){
+#set -x
+exec_ffmpeg() {
+INFO=$($FFMPEG -i "$1" 2>&1 | grep "Duration\|Audio:\|Video:")
+DUR=$(echo "$INFO" | grep Duration | awk '{print $2}' | tr -d ,)
+DURTIME=$(echo "$DUR" | sed 's/\(.*\).../\1/' | awk -F: '{ print ($1 * 3600) + ($2 * 60) + $3 }')
+aud=$(echo "$INFO" | grep Audio: | awk -F"Audio: " '{print $2}' | awk '{ print $1 }')
+vid=$(echo "$INFO" | grep Video: | awk -F"Video: " '{print $2}' | awk '{ print $1 }')
+ext=$(echo "$INFO" | grep Audio: | awk -F"Audio: " '{print $2}' | awk '{print $1}' | sed -e  's/,//g')
+
+
+
+$FFMPEG $ow -i "$1" -vn -ac $CHANN -ar $FREQ -f wav - < /dev/null 2>/tmp/ffmpeg_output | lame $lameopts - "$DIR/$name.$FORMAT" &
+
+running(){ ps $1 | grep $1 >/dev/null; }
+
+CPPID=$!
+START=$(date +%s); TODOTIME=0; ETA=0; ELAPSED=0
+trap "kill $CPPID" 2 15
+
+(
+	while running $CPPID; do
+                   LINE=$(tail -2 /tmp/ffmpeg_output | grep 'size=')
+while [ -z "$LINE" ]; do
+sleep 1
+                   LINE=$(tail -2 /tmp/ffmpeg_output | grep 'size=')
+if [ -n "$LINE" ]; then
+                   LINE=$(tail -2 /tmp/ffmpeg_output | grep 'size=')
+break
+fi
+done
+	if [ -L $(which avconv) ] && [ -e /usr/bin/ffmpeg ]; then
+TODO=`echo -ne "\r$LINE"  | sed -e 's/.*time=//' -e 's, .*,,'`
+VSTATS=$(echo "$TODO" | sed 's/\(.*\).../\1/' | awk -F: '{ print ($1 * 3600) + ($2 * 60) + $3 }')
+	else
+VSTATS=`echo -ne "\r$LINE" | sed -e 's/.*time=//' -e 's, .*,,' | sed 's/\(.*\).../\1/'`
+TODO=$(date -u -d @${VSTATS} +%H:%M:%S)
+	fi
+
+    if [ $VSTATS -gt $TODOTIME ]; then                # Parsed sane or not yet?
+        TODOTIME=$VSTATS
+        PERC=$(( 100 * TODOTIME / DURTIME ))     # Progbar calc.
+	#PERC=`echo -e "\e[0;34m${PERC}%\e[0m"`
+        ELAPSED=$(( $(date +%s) - START )); echo $ELAPSED > /tmp/elapsed.value
+        ETA=$(date -d @$(awk 'BEGIN{print int(('$ELAPSED' / '$TODOTIME') *\
+        ('$DURTIME' - '$TODOTIME'))}') -u +%H:%M:%S)   # ETA calc.
+
+    fi
+
+first_second() {
+first=$(echo "${MY_ARR}" | cut -d'|' -f1 | rev | cut -c $l- | rev)
+second=$(echo "${MY_ARR}" | cut -d'|' -f2-)
+second=$(echo "${second:$r}")
+string="$first...$second"
+#echo $string
+#echo num="${#string}"
+}
+
+x="$DIR/$name.$FORMAT"
+y="${#x}"
+#echo $y
+if [ "$y" -gt "130" ] && [ "$y" -le "140" ]; then
+l=27; r=27
+MY_ARR="$(echo "$x" | awk '$0=substr($0,1,48)"|"substr($0,50,length($0))')"
+first_second
+elif [ "$y" -gt "120" ] && [ "$y" -le "130" ]; then
+l=23; r=23
+MY_ARR="$(echo "$x" | awk '$0=substr($0,1,44)"|"substr($0,46,length($0))')"
+first_second
+elif [ "$y" -gt "110" ] && [ "$y" -le "120" ]; then
+l=19; r=19
+MY_ARR="$(echo "$x" | awk '$0=substr($0,1,40)"|"substr($0,42,length($0))')"
+first_second
+elif [ "$y" -gt "100" ] && [ "$y" -le "110" ]; then
+l=15; r=15
+MY_ARR="$(echo "$x" | awk '$0=substr($0,1,36)"|"substr($0,38,length($0))')"
+first_second
+elif [ "$y" -gt "90" ] && [ "$y" -le "100" ]; then
+l=11; r=11
+MY_ARR="$(echo "$x" | awk '$0=substr($0,1,31)"|"substr($0,33,length($0))')"
+first_second
+elif [ "$y" -gt "80" ] && [ "$y" -le "90" ]; then
+l=7; r=7
+MY_ARR="$(echo "$x" | awk '$0=substr($0,1,26)"|"substr($0,28,length($0))')"
+first_second
+elif [ "$y" -gt "140" ]; then
+string="$name.$FORMAT"
+else
+string="$DIR/$name.$FORMAT"
+#echo $string
+fi
+
+echo "XXX"
+echo "Processing $bname..."
+echo "\\n"
+echo "Video codec: $vid    Audio codec: $aud"
+echo "\\n"
+echo "Destination:  $string"
+echo "\\n"
+echo "Video duration time processed:    $TODO/$DUR"
+echo "\\n" 
+echo "Time Elapsed: $(date -d @$ELAPSED -u +%H:%M:%S)                                Time left: $ETA"
+echo "\\n"
+echo "                             Close this Window to Cancel processing."
+echo "XXX"
+      echo $PERC
+    sleep 1
+piddialog="`ps -eo pid,args | grep -v grep | grep 'Xdialog --title Extracting Audio...' | awk '{ print $1 }'`"
+
+if [ -z "$piddialog" ]; then
+sleep 2
+kill "$CPPID"
+rm -f "$DIR/$name.$FORMAT"
+break
+fi
+   done
+if [ "$TODOTIME" = "0" ]; then
+ERR=yes
+piddialog="`ps -eo pid,args | grep -v grep | grep 'Xdialog --title Extracting Audio...' | awk '{ print $1 }'`"
+kill $piddialog
+sleep 1
+errline=$(tail -2 /tmp/ffmpeg_output)
+Xdialog --title "Video2Audio" --msgbox " An error occurred.  \n FFmpeg message: \n $errline  " 0 0
+fi   
+  echo 100
+   sleep 1   
+) | Xdialog --title "Extracting Audio..." --left --gauge " To cancel conversion, Close this window. " 17 120 0
+}
+	      
+
+	      DIR="$(dirname "$1")"
+              name=$(basename "$1" |sed 's/\(.*\)\..*/\1/')
+	      bname=$(basename "$1")
+
+if [ -f "$DIR/$name"."$FORMAT" ]; then
+yad --title "File exists" --width=600 --text "  File $DIR/$name.$FORMAT already exists.  \n     Overwrite?" --button="gtk-yes:0" --button="gtk-no:1"
+ret=$?
+if [[ $ret -ne 0 ]]; then
+:
+else
+ow="-y"
+exec_ffmpeg "$1"
+fi
+else
+exec_ffmpeg "$1"
+fi
+}
+
+
+copy_audio (){
+#set -x
+exec_ffmpeg() {
+$FFMPEG $ow -i "$1" -vn -acodec copy "$DIR/$name"."$ext" < /dev/null 2>/tmp/ffmpeg_output &
+
+running(){ ps $1 | grep $1 >/dev/null; }
+
+CPPID=$!
+START=$(date +%s); TODOTIME=0; ETA=0; ELAPSED=0
+trap "kill $CPPID" 2 15
+
+(
+	while running $CPPID; do
+                   LINE=$(tail -2 /tmp/ffmpeg_output | grep 'size=')
+while [ -z "$LINE" ]; do
+sleep 1
+                   LINE=$(tail -2 /tmp/ffmpeg_output | grep 'size=')
+if [ -n "$LINE" ]; then
+                   LINE=$(tail -2 /tmp/ffmpeg_output | grep 'size=')
+break
+fi
+done
+	if [ -L $(which avconv) ] && [ -e /usr/bin/ffmpeg ]; then
+TODO=`echo -ne "\r$LINE"  | sed -e 's/.*time=//' -e 's, .*,,'`
+VSTATS=$(echo "$TODO" | sed 's/\(.*\).../\1/' | awk -F: '{ print ($1 * 3600) + ($2 * 60) + $3 }')
+	else
+VSTATS=`echo -ne "\r$LINE" | sed -e 's/.*time=//' -e 's, .*,,' | sed 's/\(.*\).../\1/'`
+TODO=$(date -u -d @${VSTATS} +%H:%M:%S)
+	fi
+
+    if [ $VSTATS -gt $TODOTIME ]; then                # Parsed sane or not yet?
+        TODOTIME=$VSTATS
+        PERC=$(( 100 * TODOTIME / DURTIME ))     # Progbar calc.
+	#PERC=`echo -e "\e[0;34m${PERC}%\e[0m"`
+        ELAPSED=$(( $(date +%s) - START )); echo $ELAPSED > /tmp/elapsed.value
+        ETA=$(date -d @$(awk 'BEGIN{print int(('$ELAPSED' / '$TODOTIME') *\
+        ('$DURTIME' - '$TODOTIME'))}') -u +%H:%M:%S)   # ETA calc.
+
+    fi
+
+
+
+first_second() {
+first=$(echo "${MY_ARR}" | cut -d'|' -f1 | rev | cut -c $l- | rev)
+second=$(echo "${MY_ARR}" | cut -d'|' -f2-)
+second=$(echo "${second:$r}")
+string="$first...$second"
+#echo $string
+#echo num="${#string}"
+}
+
+x="$DIR/$name.$ext"
+y="${#x}"
+#echo $y
+if [ "$y" -gt "130" ] && [ "$y" -le "140" ]; then
+l=27; r=27
+MY_ARR="$(echo "$x" | awk '$0=substr($0,1,48)"|"substr($0,50,length($0))')"
+first_second
+elif [ "$y" -gt "120" ] && [ "$y" -le "130" ]; then
+l=23; r=23
+MY_ARR="$(echo "$x" | awk '$0=substr($0,1,44)"|"substr($0,46,length($0))')"
+first_second
+elif [ "$y" -gt "110" ] && [ "$y" -le "120" ]; then
+l=19; r=19
+MY_ARR="$(echo "$x" | awk '$0=substr($0,1,40)"|"substr($0,42,length($0))')"
+first_second
+elif [ "$y" -gt "100" ] && [ "$y" -le "110" ]; then
+l=15; r=15
+MY_ARR="$(echo "$x" | awk '$0=substr($0,1,36)"|"substr($0,38,length($0))')"
+first_second
+elif [ "$y" -gt "90" ] && [ "$y" -le "100" ]; then
+l=11; r=11
+MY_ARR="$(echo "$x" | awk '$0=substr($0,1,31)"|"substr($0,33,length($0))')"
+first_second
+elif [ "$y" -gt "80" ] && [ "$y" -le "90" ]; then
+l=7; r=7
+MY_ARR="$(echo "$x" | awk '$0=substr($0,1,26)"|"substr($0,28,length($0))')"
+first_second
+elif [ "$y" -gt "140" ]; then
+string="$name.$ext"
+else
+string="$DIR/$name.$ext"
+#echo $string
+fi
+
+echo "XXX"
+echo "Processing $bname..."
+echo "\\n"
+echo "Video codec: $vid    Audio codec: $aud"
+echo "\\n"
+echo "Destination:  $string"
+echo "\\n"
+echo "Video duration time processed:    $TODO/$DUR"
+echo "\\n" 
+echo "Time Elapsed: $(date -d @$ELAPSED -u +%H:%M:%S)                                Time left: $ETA"
+echo "\\n"
+echo "                             Close this Window to Cancel processing."
+echo "XXX"
+      echo $PERC
+    sleep 1
+piddialog="`ps -eo pid,args | grep -v grep | grep 'Xdialog --title Extracting Audio...' | awk '{ print $1 }'`"
+
+if [ -z "$piddialog" ]; then
+sleep 2
+kill "$CPPID"
+sleep 1
+rm -f "$DIR/$name.$ext"
+break
+fi
+   done
+if [ "$TODOTIME" = "0" ]; then
+piddialog="`ps -eo pid,args | grep -v grep | grep 'Xdialog --title Extracting Audio...' | awk '{ print $1 }'`"
+kill $piddialog
+sleep 1
+errline=$(tail -2 /tmp/ffmpeg_output)
+Xdialog --title "Video2Audio" --msgbox " An error occurred.  \n FFmpeg message: \n $errline  " 0 0
+fi   
+  echo 100
+   sleep 1   
+) | Xdialog --title "Extracting Audio..." --left --gauge " To cancel conversion, Close this window. " 17 120 0
+
+}
+	      DIR="$(dirname "$1")"
+              name=$(basename "$1" |sed 's/\(.*\)\..*/\1/')
+	      bname=$(basename "$1")
+INFO=$($FFMPEG -i "$1" 2>&1 | grep "Duration\|Audio:\|Video:")
+DUR=$(echo "$INFO" | grep Duration | awk '{print $2}' | tr -d ,)
+DURTIME=$(echo "$DUR" | sed 's/\(.*\).../\1/' | awk -F: '{ print ($1 * 3600) + ($2 * 60) + $3 }')
+aud=$(echo "$INFO" | grep Audio: | awk -F"Audio: " '{print $2}' | awk '{ print $1 }')
+vid=$(echo "$INFO" | grep Video: | awk -F"Video: " '{print $2}' | awk '{ print $1 }')
+ext=$(echo "$INFO" | grep Audio: | awk -F"Audio: " '{print $2}' | awk '{print $1}' | sed -e  's/,//g')
+	        [ "$ext" = "aac" ] && ext=m4a
+		[ "$ext" = "pcm_s16le" ] && ext=wav
+                [ "$ext" = "vorbis" ] && ext=ogg
+if [ -f "$DIR/$name"."$ext" ]; then
+yad --title "File exists" --width=600 --text "  File $DIR/$name.$ext already exists.  \n     Overwrite?" --button="gtk-yes:0" --button="gtk-no:1"
+ret=$?
+if [[ $ret -ne 0 ]]; then
+:
+else
+ow="-y"
+exec_ffmpeg "$1"
+fi
+else
+
+exec_ffmpeg "$1"
+fi
+}
+
+
+#makes sure at least 1 file was selected.
+if [ $# -eq 0 ]; then
+	yad --title="Error" --text=" You must select at least 1 file. "
+	exit 1
+fi
+
+if [ "$test_lame" -eq "1" ]; then
+SETUP=`yad --title="Video2Audio" --center --text="                  <b>Convert or Copy video to audio</b>  \n    Select single or multiple video files to extract.  \n    Can also be used to convert audio files to another format.  \n    When using 'Copy' the other settings below do <b>not</b> apply.  " \
+--window-icon="preferences-system" --form \
+--field=" Choose format ('Copy' is best quality and fastest)::CB" "Copy!mp3!wav!flac!ogg!m4a" \
+--field=" Set bitrate: :CBE" "128!64!192!224!320" \
+--field=" Set frequency in Hz: :CBE" "44100!48000" \
+--field=" Set channels: :NUM" "2!1..2!1" \
+--field=" Use advanced options for lame (mp3 only):CHK" "FALSE" \
+--button="gtk-quit:1" --button="gtk-ok:0"`
+ret=$?
+[[ $ret -ne 0 ]] && exit
+else
+SETUP=`yad --title="Video2Audio" --center --text="                  <b>Convert or Copy video to audio</b>  \n    Select single or multiple video files to extract.  \n    Can also be used to convert audio files to another format.  \n    When using 'Copy' the other settings below do <b>not</b> apply.  " \
+--window-icon="preferences-system" --form \
+--field=" Choose format ('Copy' is best quality and fastest)::CB" "Copy!mp3!wav!flac!ogg!m4a" \
+--field=" Set bitrate: :CBE" "128!64!192!224!320" \
+--field=" Set frequency in Hz: :CBE" "44100!48000" \
+--field=" Set channels: :NUM" "2!1..2!1" \
+--button="gtk-quit:1" --button="gtk-ok:0"`
+ret=$?
+[[ $ret -ne 0 ]] && exit
+fi
+
+export FORMAT="`echo $SETUP | cut -d "|" -f 1`"
+export BIT="`echo $SETUP | cut -d "|" -f 2`"
+export FREQ="`echo $SETUP | cut -d "|" -f 3`"
+export CHANN="`echo $SETUP | cut -d "|" -f 4`"
+ADVMP3="`echo $SETUP | cut -d "|" -f 5`"
+
+# Copy actions:
+if [ "$FORMAT" = "Copy" ]; then
+	while  [ $# -gt 0 ]; do
+              copy_audio "$1"
+	      shift	
+	done
+yad --title=Video2Audio --text "     <b>   All Audio Extraction is Done!   </b>     " --button="gtk-close:0"	
+	      exit
+fi
+
+# Convert actions:
+if [ "$FORMAT" = "wav" ] || [ "$FORMAT" = "flac" ] ; then
+	define_format
+	BIT="0"
+	while  [ $# -gt 0 ]; do
+              encode_audio "$1"
+		shift
+	done
+yad --title=Video2Audio --text "     <b>All Audio Extraction is Done!</b>     " --button="gtk-close:0"
+	exit
+fi
+
+if [ "$FORMAT" = "mp3" ]; then
+    if [ "$ADVMP3" = "TRUE" ]; then
+        define_lameopts
+        while  [ $# -gt 0 ]; do
+              encode_mp3adv "$1"
+	      shift
+	done
+yad --title=Video2Audio --text "     <b>All Audio Extraction is Done!</b>     " --button="gtk-close:0"
+	exit
+    else
+	define_format
+	while  [ $# -gt 0 ]; do
+              encode_audio "$1"
+		shift
+	done
+yad --title=Video2Audio --text "     <b>All Audio Extraction is Done!</b>     " --button="gtk-close:0"
+	exit
+    fi
+fi
+if [ "$FORMAT" = "ogg" ] || [ "$FORMAT" = "m4a" ] ; then
+	define_format
+	while  [ $# -gt 0 ]; do
+              encode_audio "$1"
+	      shift
+	done
+yad --title=Video2Audio --text "     <b>All Audio Extraction is Done!</b>     " --button="gtk-close:0"
+	exit
+fi
+

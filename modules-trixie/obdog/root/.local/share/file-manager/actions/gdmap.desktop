@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Action
+Tooltip=Graphical Disk Map
+Name=Graphical Disk Map
+Profiles=profile-zero;
+Icon=gdmap_icon
+
+[X-Action-Profile profile-zero]
+MimeTypes=inode/directory
+Exec=gdmap -f %f
+Name=Default profile

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=weX
+Icon=wex48.png
+Comment=AV and X11 recorder
+Exec=wex
+Terminal=false
+Type=Application
+Categories=AudioVideo
+GenericName=weX AV and X11 recorder

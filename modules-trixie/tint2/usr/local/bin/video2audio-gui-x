@@ -1,0 +1,591 @@
+#!/bin/bash
+#set -x
+
+[ "`whoami`" != "root" ] && exec gsu ${0}
+
+export LC_ALL=C
+
+if [ -z `which dialog` ]; then
+	msg="  Cannot continue without dialog, please install it: \n  apt-get install dialog "
+	xmessage "`echo -e $msg`"
+exit 0
+fi
+
+if [ -z `which yad` ]; then
+	msg="  Cannot continue without yad, please install it."
+	xmessage "`echo -e $msg`"
+exit 0
+fi
+
+[ $(which avconv) ] && export FFMPEG=avconv
+[ $(which ffmpeg) ] && export FFMPEG=ffmpeg 
+
+ffmpegtosfs() {
+LFONT="<span size='large' foreground='dark blue'><b>          *** Make libav-tools sfs module ***</b></span>"
+devs="$(blkid -o list | grep /dev | grep -E -v "swap|ntfs|vfat" | sort | cut -d" " -f1 | grep -E -v "/loop|sr0|swap" | sed 's|/dev/||g')"
+echo $devs
+DEVS=`echo $devs | sed 's/ /!/g'`
+SETUP=`yad  --center --title="ffmpeg2sfs"  --text="  $LFONT \n Create libav-tools module from downloaded packages by apt-get. \n <b>Note: This module will not be registered by dpkg. </b> \n After creating the module load libav-tools.sfs \n Type avconv in terminal to see the help menu. \n To start fresh, 'apt-get clean' will run before downloading. \n<span foreground='dark red'><b> This will remove all deb packages in /var/cache/apt/archives. </b></span>" \
+--field="*** Click for more information about ffmpeg2sfs. ***:BTN" "sh -c 'echo -e "'" Running ffmpeg2sfs script will create libav-tools.sfs separate module from downloaded with apt-get packages. You can simply install libav-tools with apt-get or Synaptic but the size will be 44 Mb uncompressed data in your save file. ffmpeg2sfs will create 8,1 Mb sfs module for the user who like to keep the system size small and load libav-tools.sfs only when it is needed. We can not provide ready for use libav-tools.sfs because it will contain modified version of non-free dependencies packages. Distribution of ready for use libav-tools.sfs will be violation of the license. 
+
+Ahyway with this simple script you can make your own libav-tools.sfs module in only few minutes on DebianDog by single click starting ffmpeg2sfs script and confirmation click on OK button. Read the information on the GUI window before confirming OK button. 
+
+After creating libav-tools.sfs load it with right click sfs load option or with SFS-Loader. Type in terminal avconv for available options. Or avplay /path/to/video-file to play video. 
+ "'" | yad --title="'"Info dpkg registration"'" --height=350 --width=650 --text-info --wrap --button="'"gtk-close:0"'"'" \
+--window-icon="preferences-system" --form  \
+--window-icon="preferences-system" --form --columns=1 \
+--field="   Choose where to create libav-tools.sfs module, must be on linux filesystem. NTFS or FAT filesytems are excluded.  :LBL"  "" \
+--field=" :CB" "$DEVS" \
+--field="   libav-tools is already set for download. Click OK button to start: :LBL" "" \
+--field=" : " "libav-tools" \
+--field=" Run 'apt-get update' first (recommended):CHK" "TRUE" \
+--button="gtk-quit:1" --button="gtk-ok:0"`
+ret=$?
+[[ $ret -ne 0 ]] && exit
+
+yad --on-top --title="ffmpeg2sfs" --text="  <span size='large' foreground='dark green'><b>*** Checking network connection... ***</b></span>  " --center --undecorated --no-buttons &
+pd=$!
+
+if (ping -w5 -c3 4.2.2.1) > /dev/null; then
+echo "Up"
+else
+kill $pd
+yad --text="  There is no network connection. " --title="ffmpeg2sfs" --button="gtk-close:0"
+exit 0
+fi
+kill $pd
+
+DRV="`echo $SETUP | cut -d "|" -f 3`"
+INSTALL="`echo $SETUP | cut -d "|" -f 5`"
+UPDATE="`echo $SETUP | cut -d "|" -f 6`"
+
+if [ -z "$DRV" ] || [ -z "$INSTALL" ]; then
+yad --center --title="ffmpeg2sfs" --text=" You probably did not fill in all fields, \n Please run again." --button="gtk-close:0"
+exit 0
+fi
+
+if [ "$UPDATE" = "TRUE" ]; then
+yad --on-top --title="ffmpeg2sfs" --text="  <span size='large' foreground='dark green'><b>*** Updating the repositories... ***</b></span>  " --center --undecorated --no-buttons &
+pd=$!
+apt-get update
+ret=$?
+kill $pd
+if [[ $ret -eq 100 ]]; then
+yad --title ffmpeg2sfs --text " There are one or more errors with updating. \n Check your /etc/apt/sources.list. \n         Still continue? \n        (not recommended) " --button="gtk-no:1" --button="gtk-yes:0"
+ret=$?
+[[ $ret -eq 1 ]] && exit 0
+fi
+fi
+
+SFS=$(for i in "$INSTALL"; do echo $(echo $i | sed 's| |_|g'); done)
+echo $SFS
+
+yad --on-top --title="ffmpeg2sfs" --text="  <span size='large' foreground='dark green'><b>*** Checking package(s)... ***</b></span>  " --center --undecorated --no-buttons &
+pd=$!
+export DEBIAN_FRONTEND=noninteractive
+apt-get install -s -y --force-yes $INSTALL -d
+ret=$?
+kill $pd
+if [[ $ret -eq 100 ]]; then
+apt-get install -s -y --force-yes $INSTALL -d 2>&1 | yad --width 400 --height 300 --title ffmpeg2sfs --wrap --tail --text " Sorry, there are one or more errors, see below. " --text-info --button="gtk-close:0"
+exit 0
+fi
+
+mkdir /mnt/$DRV 2> /dev/null
+mount /dev/$DRV /mnt/$DRV 2> /dev/null
+if [ -d "/mnt/$DRV/$SFS" ]; then
+yad --center --title="ffmpeg2sfs" --text=" Directory "/mnt/$DRV/$SFS" already exists, \n Please rename and run again. " --button="gtk-close:0"
+exit 0
+fi
+
+# Check if module already exists.
+if [ -f "/mnt/$DRV/$SFS".sfs ]; then
+yad --center --title="ffmpeg2sfs" --text=" Module: /mnt/$DRV/$SFS.sfs already exists, \n Please rename and run again. " --button="gtk-close:0"
+exit 0
+fi
+
+apt-get clean
+cmd="apt-get install -y --force-yes $INSTALL -d"
+(
+apt-get install -y --force-yes $INSTALL -d
+echo
+echo "This window will close in a few seconds..."
+) 2>&1 | yad --title=ffmpeg2sfs --text-info --text="  <span foreground='dark green'><b>Downloading deb package(s)...</b></span> " --height=300 --width=600 --wrap --tail --button="gtk-cancel:1" &
+
+pdapt="`ps -eo pid,args | grep -v grep | grep "$cmd" | awk '{ print $1 }'`"
+pdyad="`ps -eo pid,args | grep -v grep | grep "yad --title=ffmpeg2sfs" | awk '{ print $1 }'`"
+
+while ps -p $pdapt > /dev/null
+do sleep 1
+pdyad="`ps -eo pid,args | grep -v grep | grep "yad --title=ffmpeg2sfs" | awk '{ print $1 }'`"
+if [ -z $pdyad ]; then
+kill $pdapt
+exit 0
+fi
+done
+
+sleep 3
+kill $pdyad 2> /dev/null
+
+mkdir -p "/mnt/$DRV/$SFS" # Make new directory.
+
+yad --on-top --title="ffmpeg2sfs" --text="  <span size='large' foreground='dark green'><b>*** Extracting deb packages... ***</b></span>  " --center --undecorated --no-buttons &
+pd=$!
+cd /var/cache/apt/archives/ 
+for arg in *.deb ; do
+dpkg -x "$arg" "/mnt/$DRV/$SFS"
+done
+kill $pd
+
+cd "/mnt/$DRV/$SFS"
+
+echo "Cleaning..."
+rm -fr "/mnt/$DRV/$SFS"/etc
+rm -fr "/mnt/$DRV/$SFS"/opt
+rm -fr "/mnt/$DRV/$SFS"/root
+rm -fr "/mnt/$DRV/$SFS"/var
+rm -fr "/mnt/$DRV/$SFS"/usr/share/doc
+rm -fr "/mnt/$DRV/$SFS"/usr/share/man
+rm -fr "/mnt/$DRV/$SFS"/usr/lib/i386-linux-gnu/i686/cmov/libavcodec.so.54.59.100
+rm -fr "/mnt/$DRV/$SFS"/usr/lib/i386-linux-gnu/i686/cmov/libavformat.so.54.29.104
+ln -s /usr/lib/i386-linux-gnu/libavcodec.so.54.59.100 "/mnt/$DRV/$SFS"/usr/lib/i386-linux-gnu/i686/cmov/libavcodec.so.54.59.100
+ln -s /usr/lib/i386-linux-gnu/libavformat.so.54.29.104 "/mnt/$DRV/$SFS"/usr/lib/i386-linux-gnu/i686/cmov/libavformat.so.54.29.104
+
+cd "/mnt/$DRV"
+
+xterm -T "ffmpeg2sfs" -si -sb -fg black -bg white -geometry 65x10 -e "mksquashfs "$SFS" "$SFS".sfs -comp xz -b 1024k -Xbcj x86"
+
+yad --title="ffmpeg2sfs" --center --text=" Done creating '/mnt/$DRV/$SFS.sfs' \n Do you want to remove '/mnt/$DRV/$SFS'? " --button="gtk-yes:0" --button="gtk-no:1"
+ret=$?
+if [[ $ret -eq 0 ]]; then
+if [ -d "/mnt/$DRV/$SFS" ]; then
+rm -rf "/mnt/$DRV/$SFS"
+fi
+fi
+export DRV=$DRV
+export SFS=$SFS
+
+loadmodule -a /mnt/$DRV/$SFS.sfs
+}
+
+#this part tests to see if libav-tools is installed, and if not, ask to create libav-tools.sfs
+# test_ffmpeg=`which avconv | grep -c "avconv"`
+# if [ "$test_ffmpeg" -eq "0" ]; then
+if [ -z $(which avconv) ] && [ -z $(which ffmpeg) ]; then
+	yad --title="Error" --text="  You do not have libav-tools installed. \n  Do you want to create libav-tools module?." --button="gtk-yes:0" --button="gtk-no:1"
+ret=$?
+	if [[ $ret -ne 0 ]]; then
+exit 0
+	else
+	export -f ffmpegtosfs
+		if [ "`whoami`" != "root" ]; then
+	exec gsu sh -c ffmpegtosfs &
+		wait
+		else
+	ffmpegtosfs
+		fi
+	exec ${0}
+	fi
+fi
+
+test_lame=`which lame | grep -c "lame"`
+if [ "$test_lame" -eq "0" ]; then
+	yad --title="Dependency check" --text="  You do not have lame installed. \n  Please install it to be able to use advanced options for mp3.  " \
+        --button="gtk-close:0"
+fi
+define_format() {
+	if [ "$FORMAT" = "mp3" ]; then 
+		codec="libmp3lame"
+	fi
+        if [ "$FORMAT" = "ogg" ]; then 
+		codec="libvorbis"
+	fi
+        if [ "$FORMAT" = "flac" ]; then 
+		codec="flac"
+	fi
+        if [ "$FORMAT" = "wav" ]; then 
+		codec="pcm_s16le"
+	fi
+        if [ "$FORMAT" = "m4a" ]; then 
+		codec="libfaac"
+	fi
+export codec=$codec
+}
+define_lameopts (){
+	lameopts=`yad --height="400" --width="500" --title="Advanced mp3 settings" --text="Which lame settings would you like to use?
+	" --list --editable --separator="" \
+	--column="Edit & Pick" \
+	 " --alt-preset fast extreme -m s -V 2 --lowpass 20 " \
+	 " --vbr-new " \
+	 " --alt-preset fast extreme " \
+	 " -b 128 -h " \
+	 " -b 192 -h " \
+         " -b 320 -h " `
+
+         if [ ! "$lameopts" ]; then 
+		yad --title="Error" --text="Please choose a setting for the new audio file and try again." 
+		exit
+	fi
+export lameopts=$lameopts
+}
+
+encode_audio (){
+#set -x
+while IFS= read -r line
+do
+	      DIR="$(dirname "$line")"
+              name=$(basename "$line" |sed 's/\(.*\)\..*/\1/')
+	      bname=$(basename "$line")
+if [ -f "$DIR/$name"."$FORMAT" ]; then
+yad --title "File exists" --width=600 --text "  File $DIR/$name.$FORMAT already exists.  \n     Overwrite?" --button="gtk-yes:0" --button="gtk-no:1"
+ret=$?
+[[ $ret -ne 0 ]] && continue
+ow="-y"
+fi
+INFO=$($FFMPEG -i "$line" 2>&1 | grep "Duration\|Audio:\|Video:")
+DUR=$(echo "$INFO" | grep Duration | awk '{print $2}' | tr -d ,)
+DURTIME=$(echo "$DUR" | sed 's/\(.*\).../\1/' | awk -F: '{ print ($1 * 3600) + ($2 * 60) + $3 }')
+aud=$(echo "$INFO" | grep Audio: | awk -F"Audio: " '{print $2}' | awk '{ print $1 }')
+vid=$(echo "$INFO" | grep Video: | awk -F"Video: " '{print $2}' | awk '{ print $1 }')
+ext=$(echo "$INFO" | grep Audio: | awk -F"Audio: " '{print $2}' | awk '{print $1}' | sed -e  's/,//g')
+
+$FFMPEG $ow -i "$line" -vn -acodec "$codec"  -ac "$CHANN" -ar "$FREQ" -ab "${BIT}"k "$DIR/$name.$FORMAT" < /dev/null 2>/tmp/ffmpeg_output &
+
+running(){ ps $1 | grep $1 >/dev/null; }
+
+CPPID=$!
+START=$(date +%s); TODOTIME=0; ETA=0; ELAPSED=0
+trap "kill $CPPID" 2 15
+
+(
+	while running $CPPID; do
+                   LINE=$(tail -2 /tmp/ffmpeg_output | grep 'size=')
+while [ -z "$LINE" ]; do
+sleep 1
+                   LINE=$(tail -2 /tmp/ffmpeg_output | grep 'size=')
+if [ -n "$LINE" ]; then
+                   LINE=$(tail -2 /tmp/ffmpeg_output | grep 'size=')
+break
+fi
+done
+	if [ -L $(which avconv) ] && [ -e /usr/bin/ffmpeg ]; then
+TODO=`echo -ne "\r$LINE"  | sed -e 's/.*time=//' -e 's, .*,,'`
+VSTATS=$(echo "$TODO" | sed 's/\(.*\).../\1/' | awk -F: '{ print ($1 * 3600) + ($2 * 60) + $3 }')
+	else
+VSTATS=`echo -ne "\r$LINE" | sed -e 's/.*time=//' -e 's, .*,,' | sed 's/\(.*\).../\1/'`
+TODO=$(date -u -d @${VSTATS} +%H:%M:%S)
+	fi
+
+    if [ $VSTATS -gt $TODOTIME ]; then                # Parsed sane or not yet?
+        TODOTIME=$VSTATS
+        PERC=$(( 100 * TODOTIME / DURTIME ))     # Progbar calc.
+	#PERC=`echo -e "\e[0;34m${PERC}%\e[0m"`
+        ELAPSED=$(( $(date +%s) - START )); echo $ELAPSED > /tmp/elapsed.value
+        ETA=$(date -d @$(awk 'BEGIN{print int(('$ELAPSED' / '$TODOTIME') *\
+        ('$DURTIME' - '$TODOTIME'))}') -u +%H:%M:%S)   # ETA calc.
+
+    fi
+
+
+echo "XXX"
+echo "Processing $bname..."
+echo "\\n"
+echo "Video codec: $vid    Audio codec: $aud"
+echo "\\n"
+echo "Destination:  $name.$FORMAT"
+echo "\\n"
+echo "Video duration time processed:    $TODO/$DUR"
+echo "\\n" 
+echo "Time Elapsed: $(date -d @$ELAPSED -u +%H:%M:%S)                                Time left: $ETA"
+echo "\\n"
+echo "                  Close this Window to Cancel processing."
+echo "XXX"
+      echo $PERC
+    sleep 1
+piddialog="`ps -eo pid,args | grep -v grep | grep 'Xdialog --title Extracting Audio...' | awk '{ print $1 }'`"
+
+if [ -z "$piddialog" ]; then
+sleep 2
+kill "$CPPID"
+rm -f "$DIR/$name.$FORMAT"
+break
+fi
+   done
+if [ "$TODOTIME" = "0" ]; then
+piddialog="`ps -eo pid,args | grep -v grep | grep 'Xdialog --title Extracting Audio...' | awk '{ print $1 }'`"
+kill $piddialog
+sleep 1
+errline=$(tail -2 /tmp/ffmpeg_output)
+Xdialog --title "Video2Audio" --msgbox " An error occurred.  \n avconv message: \n $errline  " 0 0
+fi   
+  echo 100
+   sleep 1   
+) | Xdialog --title "Extracting Audio..." --left --gauge " To cancel conversion, Close this window. " 17 120 0
+done <<< "$(echo -e "$FILES")"
+}
+
+encode_mp3adv (){
+#set -x
+pidx="`ps -eo pid,args | grep -v grep | grep 'xterm -hold -T Extracting audio...' | awk '{ print $1 }'`"
+while IFS= read -r line
+do
+	      DIR="$(dirname "$line")"
+              name=$(basename "$line" |sed 's/\(.*\)\..*/\1/')
+	      bname=$(basename "$line")
+if [ -f "$DIR/$name"."$FORMAT" ]; then
+yad --title "File exists" --width=600 --text "  File $DIR/$name.$FORMAT already exists.  \n     Overwrite?" --button="gtk-yes:0" --button="gtk-no:1"
+ret=$?
+[[ $ret -ne 0 ]] && continue
+ow="-y"
+fi
+INFO=$($FFMPEG -i "$line" 2>&1 | grep "Duration\|Audio:\|Video:")
+DUR=$(echo "$INFO" | grep Duration | awk '{print $2}' | tr -d ,)
+DURTIME=$(echo "$DUR" | sed 's/\(.*\).../\1/' | awk -F: '{ print ($1 * 3600) + ($2 * 60) + $3 }')
+aud=$(echo "$INFO" | grep Audio: | awk -F"Audio: " '{print $2}' | awk '{ print $1 }')
+vid=$(echo "$INFO" | grep Video: | awk -F"Video: " '{print $2}' | awk '{ print $1 }')
+ext=$(echo "$INFO" | grep Audio: | awk -F"Audio: " '{print $2}' | awk '{print $1}' | sed -e  's/,//g')
+
+$FFMPEG $ow -i "$line" -vn -ac $CHANN -ar $FREQ -f wav - < /dev/null 2>/tmp/ffmpeg_output | lame $lameopts - "$DIR/$name.$FORMAT" &
+
+running(){ ps $1 | grep $1 >/dev/null; }
+
+CPPID=$!
+START=$(date +%s); TODOTIME=0; ETA=0; ELAPSED=0
+trap "kill $CPPID" 2 15
+
+(
+	while running $CPPID; do
+                   LINE=$(tail -2 /tmp/ffmpeg_output | grep 'size=')
+while [ -z "$LINE" ]; do
+sleep 1
+                   LINE=$(tail -2 /tmp/ffmpeg_output | grep 'size=')
+if [ -n "$LINE" ]; then
+                   LINE=$(tail -2 /tmp/ffmpeg_output | grep 'size=')
+break
+fi
+done
+	if [ -L $(which avconv) ] && [ -e /usr/bin/ffmpeg ]; then
+TODO=`echo -ne "\r$LINE"  | sed -e 's/.*time=//' -e 's, .*,,'`
+VSTATS=$(echo "$TODO" | sed 's/\(.*\).../\1/' | awk -F: '{ print ($1 * 3600) + ($2 * 60) + $3 }')
+	else
+VSTATS=`echo -ne "\r$LINE" | sed -e 's/.*time=//' -e 's, .*,,' | sed 's/\(.*\).../\1/'`
+TODO=$(date -u -d @${VSTATS} +%H:%M:%S)
+	fi
+                              # Parse vstats file.
+    if [ $VSTATS -gt $TODOTIME ]; then                # Parsed sane or no?
+        TODOTIME=$VSTATS
+        PERC=$(( 100 * TODOTIME / DURTIME ))     # Progbar calc.
+	#PERC=`echo -e "\e[0;34m${PERC}%\e[0m"`
+        ELAPSED=$(( $(date +%s) - START )); echo $ELAPSED > /tmp/elapsed.value
+        ETA=$(date -d @$(awk 'BEGIN{print int(('$ELAPSED' / '$TODOTIME') *\
+        ('$DURTIME' - '$TODOTIME'))}') -u +%H:%M:%S)   # ETA calc.
+
+    fi
+
+echo "XXX"
+echo "Processing $bname..."
+echo "\\n"
+echo "Video codec: $vid    Audio codec: $aud"
+echo "\\n"
+echo "Destination: $name.$FORMAT"
+echo "\\n"
+echo "Video duration time processed:    $TODO/$DUR"
+echo "\\n" 
+echo "Time Elapsed: $(date -d @$ELAPSED -u +%H:%M:%S)                                Time left: $ETA"
+echo "\\n"
+echo "                  Close this Window to Cancel processing."
+echo "XXX"
+      echo $PERC
+    sleep 1
+piddialog="`ps -eo pid,args | grep -v grep | grep 'Xdialog --title Extracting Audio...' | awk '{ print $1 }'`"
+
+if [ -z "$piddialog" ]; then
+sleep 2
+kill "$CPPID"
+rm -f "$DIR/$name.$FORMAT"
+break
+fi
+   done
+if [ "$TODOTIME" = "0" ]; then
+piddialog="`ps -eo pid,args | grep -v grep | grep 'Xdialog --title Extracting Audio...' | awk '{ print $1 }'`"
+kill $piddialog
+sleep 1
+errline=$(tail -2 /tmp/ffmpeg_output)
+Xdialog --title "Video2Audio" --msgbox " An error occurred.  \n FFmpeg message: \n $errline  " 0 0
+fi   
+  echo 100
+   sleep 1   
+) | Xdialog --title "Extracting Audio..." --left --gauge " To cancel conversion, Close this window. " 17 120 0
+done <<< "$(echo -e "$FILES")"
+}
+
+copy_audio (){
+#set -x
+while IFS= read -r line; do
+
+	      DIR="$(dirname "$line")"
+              name=$(basename "$line" |sed 's/\(.*\)\..*/\1/')
+	      bname=$(basename "$line")
+INFO=$($FFMPEG -i "$line" 2>&1 | grep "Duration\|Audio:\|Video:")
+DUR=$(echo "$INFO" | grep Duration | awk '{print $2}' | tr -d ,)
+DURTIME=$(echo "$DUR" | sed 's/\(.*\).../\1/' | awk -F: '{ print ($1 * 3600) + ($2 * 60) + $3 }')
+aud=$(echo "$INFO" | grep Audio: | awk -F"Audio: " '{print $2}' | awk '{ print $1 }')
+vid=$(echo "$INFO" | grep Video: | awk -F"Video: " '{print $2}' | awk '{ print $1 }')
+ext=$(echo "$INFO" | grep Audio: | awk -F"Audio: " '{print $2}' | awk '{print $1}' | sed -e  's/,//g')
+	      [ "$ext" = "aac" ] && ext=m4a
+              [ "$ext" = "pcm_s16le" ] && ext=wav
+              [ "$ext" = "vorbis" ] && ext=ogg
+if [ -f "$DIR/${name}_"."$ext" ]; then
+yad --title "File exists" --width=600 --text "  File $DIR/${name}_.$ext already exists.  \n     Overwrite?" --button="gtk-yes:0" --button="gtk-no:1"
+ret=$?
+[[ $ret -ne 0 ]] && continue
+ow="-y"
+fi
+$FFMPEG $ow -i "$line" -vn -acodec copy "$DIR/${name}_"."$ext" < /dev/null 2>/tmp/ffmpeg_output &
+
+running(){ ps $1 | grep $1 >/dev/null; }
+
+CPPID=$!
+START=$(date +%s); TODOTIME=0; ETA=0; ELAPSED=0
+trap "kill $CPPID" 2 15
+
+(
+	while running $CPPID; do
+                   LINE=$(tail -2 /tmp/ffmpeg_output | grep 'size=')
+while [ -z "$LINE" ]; do
+sleep 1
+                   LINE=$(tail -2 /tmp/ffmpeg_output | grep 'size=')
+if [ -n "$LINE" ]; then
+                   LINE=$(tail -2 /tmp/ffmpeg_output | grep 'size=')
+break
+fi
+done
+	if [ -L $(which avconv) ] && [ -e /usr/bin/ffmpeg ]; then
+TODO=`echo -ne "\r$LINE"  | sed -e 's/.*time=//' -e 's, .*,,'`
+VSTATS=$(echo "$TODO" | sed 's/\(.*\).../\1/' | awk -F: '{ print ($1 * 3600) + ($2 * 60) + $3 }')
+	else
+VSTATS=`echo -ne "\r$LINE" | sed -e 's/.*time=//' -e 's, .*,,' | sed 's/\(.*\).../\1/'`
+TODO=$(date -u -d @${VSTATS} +%H:%M:%S)
+	fi
+                              # Parse vstats file.
+    if [ $VSTATS -gt $TODOTIME ]; then                # Parsed sane or no?
+        TODOTIME=$VSTATS
+        PERC=$(( 100 * TODOTIME / DURTIME ))     # Progbar calc.
+	#PERC=`echo -e "\e[0;34m${PERC}%\e[0m"`
+        ELAPSED=$(( $(date +%s) - START )); echo $ELAPSED > /tmp/elapsed.value
+        ETA=$(date -d @$(awk 'BEGIN{print int(('$ELAPSED' / '$TODOTIME') *\
+        ('$DURTIME' - '$TODOTIME'))}') -u +%H:%M:%S)   # ETA calc.
+
+    fi
+
+echo "XXX"
+echo "Processing $bname..."
+echo "\\n"
+echo "Video codec: $vid    Audio codec: $aud"
+echo "\\n"
+echo "Destination:  ${name}_.$ext"
+echo "\\n"
+echo "Video duration time processed:    $TODO/$DUR"
+echo "\\n" 
+echo "Time Elapsed: $(date -d @$ELAPSED -u +%H:%M:%S)                                Time left: $ETA"
+echo "\\n"
+echo "                  Close this Window to Cancel processing."
+echo "XXX"
+      echo $PERC
+    sleep 1
+piddialog="`ps -eo pid,args | grep -v grep | grep 'Xdialog --title Extracting Audio...' | awk '{ print $1 }'`"
+
+if [ -z "$piddialog" ]; then
+sleep 2
+kill "$CPPID"
+rm -f "$DIR/${name}_.$ext"
+break
+fi  
+   done
+if [ "$TODOTIME" = "0" ]; then
+piddialog="`ps -eo pid,args | grep -v grep | grep 'Xdialog --title Extracting Audio...' | awk '{ print $1 }'`"
+kill $piddialog
+sleep 1
+errline=$(tail -2 /tmp/ffmpeg_output)
+Xdialog --title "Video2Audio" --msgbox " An error occurred.  \n FFmpeg message: \n $errline  " 0 0
+fi
+ 
+  echo 100
+   sleep 1   
+) | Xdialog --title "Extracting Audio..." --left --gauge " To cancel conversion, Close this window. " 17 120 0
+done <<< "$(echo -e "$FILES")"
+}
+
+if [ "$test_lame" -eq "1" ]; then
+SETUP=`yad --title="Video2Audio" --center --text="                  <b>Convert or Copy video to audio</b>   \n    Progress will show with Xdialog.  \n    Select single or multiple video files to extract.  \n    Can also be used to convert audio files to another format.  \n    When using 'Copy' the other settings below do <b>not</b> apply.  \n    For 'flac' and 'wav' the bitrate option does <b>not</b> apply.  " \
+--window-icon="preferences-system" --form \
+--field=" Select video file(s):MFL" "" \
+--field=" Choose format ('Copy' is best quality and fastest)::CB" "Copy!mp3!wav!flac!ogg!m4a" \
+--field=" Set bitrate: :CBE" "128!64!192!224!256!320" \
+--field=" Set frequency in Hz: :CBE" "44100!48000" \
+--field=" Set channels: :NUM" "2!1..2!1" \
+--field=" Use lame advanced options (mp3 only):CHK" "FALSE" \
+--button="gtk-quit:1" --button="gtk-ok:0"`
+ret=$?
+[[ $ret -ne 0 ]] && exit
+
+else
+SETUP=`yad --title="Video2Audio" --center --text="                  <b>Convert or Copy video to audio</b>   \n    Progress will show with Xdialog.  \n    Select single or multiple video files to extract.  \n    Can also be used to convert audio files to another format.  \n    When using 'Copy' the other settings below do <b>not</b> apply. \n    For 'flac' and 'wav' the bitrate option does not apply.    " \
+--window-icon="preferences-system" --form \
+--field=" Select video file(s):MFL" "" \
+--field=" Choose format ('Copy' is best quality and fastest)::CB" "Copy!mp3!wav!flac!ogg!m4a" \
+--field=" Set bitrate: :CBE" "128!64!192!224!320" \
+--field=" Set frequency in Hz: :CBE" "44100!48000" \
+--field=" Set channels: :NUM" "2!1..2!1" \
+--button="gtk-quit:1" --button="gtk-ok:0"`
+ret=$?
+[[ $ret -ne 0 ]] && exit
+fi
+
+IFS='%'
+FILES="`echo "$SETUP" | cut -d "|" -f 1`"
+export FORMAT="`echo "$SETUP" | cut -d "|" -f 2`"
+export BIT="`echo "$SETUP" | cut -d "|" -f 3`"
+export FREQ="`echo "$SETUP" | cut -d "|" -f 4`"
+export CHANN="`echo "$SETUP" | cut -d "|" -f 5`"
+ADVMP3="`echo "$SETUP" | cut -d "|" -f 6`"
+
+export FILES=$(echo "$FILES" |  tr '!' '\n')
+unset IFS
+
+if [ -z "$FILES" ]; then
+yad --title="Video2Audio" --center --text="  No video file selected. \n  Please run the script again.  " --button="gtk-close:0"
+exit 0
+fi
+
+# Copy actions:
+if [ "$FORMAT" = "Copy" ]; then
+copy_audio
+exit
+fi
+
+# Convert actions:
+if [ "$FORMAT" = "wav" ] || [ "$FORMAT" = "flac" ] ; then
+	define_format
+	BIT="0"
+encode_audio
+exit
+fi
+
+if [ "$FORMAT" = "mp3" ]; then
+    if [ "$ADVMP3" = "TRUE" ]; then
+            define_lameopts
+encode_mp3adv
+exit
+    else
+	    define_format
+encode_audio
+exit
+    fi
+fi
+
+if [ "$FORMAT" = "ogg" ] || [ "$FORMAT" = "m4a" ] ; then
+	    define_format
+encode_audio
+exit
+fi

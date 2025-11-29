@@ -1,0 +1,31 @@
+#!/bin/bash
+
+[ ! -f "$1" ] && exit
+DIR="${1%.*}"
+
+if [ "$(echo "$1" | wc -w)" -gt 1 ]; then
+  yad --window-icon="application-x-squashfs-image" --title="Rename File" --text="Remove blank spaces from\n<b>$(basename "$1")</b> \
+and try again." --text-align="center" --borders="10" --width="220" --no-buttons --timeout="3"
+exit
+fi
+
+if [ -d "$DIR" ];then
+  yad --window-icon="application-x-squashfs-image" --title="Overwrite" --text="<b>$(basename $DIR)</b> already exists.\n Would you like to overwrite it?\n" \
+  --text-align="center" --borders="10" --buttons-layout="center" --button="gtk-yes:0" --button="gtk-no:1"
+  case $? in
+    0) rm -rf "$DIR" ;;
+    *) exit ;;
+  esac
+fi
+
+(script -q -c "stty rows 40 cols 100; unsquashfs -d "$DIR" "$1"" | while read -n 50 LINE ; do
+echo $LINE | busybox strings | egrep '[0-9]\%' | awk '{print $NF}'; done
+) | Xdialog --title "Extracting Squashfile " --gauge "Extracting $(basename $1)\n\nPlease Wait..." 7 50 0
+if [ $? -ne 0 ]; then
+  killall unsquashfs
+  rm -f typescript
+  exit
+fi
+
+rm -f typescript
+sync 

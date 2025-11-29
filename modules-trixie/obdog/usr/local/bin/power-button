@@ -1,0 +1,12 @@
+#!/bin/bash
+
+yad --title="Shutdown" --center --width="400" --text=" Are you sure you want to shutdown the computer? " --button="gtk-yes:0" --button="gtk-no:1"
+ret=$?
+[[ $ret -eq 1 ]] && exit 0
+if [ $(whoami) != 'root' ]; then
+xterm -e sudo /usr/bin/wmpoweroff
+else
+/usr/bin/wmpoweroff
+fi
+exit 0
+

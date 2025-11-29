@@ -1,0 +1,37 @@
+[Added Associations]
+text/plain=leafpad.desktop;
+application/vnd.squashfs=conv-sfs.desktop;edit-sfs.desktop;
+application/x-squashfs=userapp-filemnt-6Y7S4Y.desktop;
+application/vnd.debian.binary-package=userapp-instdeb-F47G9X.desktop;userapp-redeb-PUEE4Y.desktop;
+application/x-cd-image=userapp-filemnt-FHBW4Y.desktop;
+x-scheme-handler/http=userapp-Firefox-OKU04Y.desktop;userapp-Firefox-UP405Y.desktop;
+x-scheme-handler/https=userapp-Firefox-OKU04Y.desktop;userapp-Firefox-UP405Y.desktop;
+x-scheme-handler/ftp=userapp-Firefox-OKU04Y.desktop;userapp-Firefox-UP405Y.desktop;
+x-scheme-handler/chrome=userapp-Firefox-OKU04Y.desktop;userapp-Firefox-UP405Y.desktop;
+text/html=userapp-Firefox-OKU04Y.desktop;userapp-Firefox-UP405Y.desktop;
+application/x-extension-htm=userapp-Firefox-OKU04Y.desktop;userapp-Firefox-UP405Y.desktop;
+application/x-extension-html=userapp-Firefox-OKU04Y.desktop;userapp-Firefox-UP405Y.desktop;
+application/x-extension-shtml=userapp-Firefox-OKU04Y.desktop;userapp-Firefox-UP405Y.desktop;
+application/xhtml+xml=userapp-Firefox-OKU04Y.desktop;userapp-Firefox-UP405Y.desktop;
+application/x-extension-xhtml=userapp-Firefox-OKU04Y.desktop;userapp-Firefox-UP405Y.desktop;
+application/x-extension-xht=userapp-Firefox-OKU04Y.desktop;userapp-Firefox-UP405Y.desktop;
+application/x-shellscript=leafpad.desktop;
+application/x-desktop=leafpad.desktop;
+
+[Default Applications]
+text/plain=leafpad.desktop
+application/x-squashfs=userapp-filemnt-6Y7S4Y.desktop
+application/x-cd-image=userapp-filemnt-FHBW4Y.desktop
+x-scheme-handler/http=userapp-Firefox-UP405Y.desktop
+x-scheme-handler/https=userapp-Firefox-UP405Y.desktop
+x-scheme-handler/ftp=userapp-Firefox-UP405Y.desktop
+x-scheme-handler/chrome=userapp-Firefox-UP405Y.desktop
+text/html=userapp-Firefox-UP405Y.desktop
+application/x-extension-htm=userapp-Firefox-UP405Y.desktop
+application/x-extension-html=userapp-Firefox-UP405Y.desktop
+application/x-extension-shtml=userapp-Firefox-UP405Y.desktop
+application/xhtml+xml=userapp-Firefox-UP405Y.desktop
+application/x-extension-xhtml=userapp-Firefox-UP405Y.desktop
+application/x-extension-xht=userapp-Firefox-UP405Y.desktop
+
+[Removed Associations]

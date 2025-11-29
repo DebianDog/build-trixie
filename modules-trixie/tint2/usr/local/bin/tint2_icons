@@ -1,0 +1,6 @@
+#!/bin/bash
+
+yad --center --title="Add or remove launchers" --text=" Add or remove .desktop launchers to/from:              \n $HOME/tint2launchers \n When done, click 'Restart tint2'  " --button="Restart tint2:0" --button="gtk-close:1"
+
+[ $? -ne 0 ] && exit
+tint2restart

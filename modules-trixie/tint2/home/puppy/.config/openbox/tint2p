@@ -1,0 +1,9 @@
+# Set the desktop background and icons
+nitrogen --restore &
+sleep 1
+
+# Top panel
+tint2 -c $HOME/.config/tint2/tint2rcl &
+
+# Bottom panel
+tint2 &

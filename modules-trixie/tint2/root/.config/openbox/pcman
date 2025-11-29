@@ -1,0 +1,9 @@
+# Set the desktop background and icons
+
+# Checks in the background for changed wallpaper (for conky background)
+#setbackdrop &
+#nitrogen --restore &
+# pcmanfm provides the desktop
+pcmanfm --desktop &
+XDG_CURRENT_DESKTOP=LXDE lxpanel &
+alsamixertray &

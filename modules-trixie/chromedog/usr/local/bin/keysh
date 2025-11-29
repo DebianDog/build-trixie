@@ -1,0 +1,69 @@
+#!/bin/bash
+
+export PROG=$0
+
+if [ -f $HOME/.config/openbox/keyshfirstrun ]; then
+[ -x "$HOME/Startup/keyshortcuts" ] && SHOW=TRUE || SHOW=FALSE
+else
+echo "This file checks for first run of keyboard shortcuts dialog." > $HOME/.config/openbox/keyshfirstrun
+SHOW=FALSE
+fi
+
+export LOCKDIR=/tmp/lock-keyshhsyek
+
+#Remove the lock directory
+function cleanup {
+    if rmdir $LOCKDIR; then
+        echo 
+    else
+        exit 1
+    fi
+}
+
+if mkdir $LOCKDIR; then
+    #Ensure that if we "grabbed a lock", we release it
+    #Works for SIGTERM and SIGINT(Ctrl-C)
+    trap "cleanup" EXIT
+
+edit_shortcuts () {
+unset GTK2_RC_FILES
+KEYLIST=$(yad --center --title "Edit Keybind List" --height=650 --width=800 --editable --fontname="MonoSpace Bold 11" --text-info --filename=$HOME/.config/openbox/keybindlist)
+
+if [ "$?" -eq 0 ]; then
+echo "$KEYLIST" > $HOME/.config/openbox/keybindlist
+rmdir $LOCKDIR
+pdyad="`ps -eo pid,cmd | grep -v grep  | grep "title=Keyboard Shortcuts" | awk '{ print $1 }'`"
+kill $pdyad
+exec $PROG
+fi
+
+}
+export -f edit_shortcuts
+
+#NK57 Monospace Italic Condensed 10
+#Droid Sans Mono Dotted Italic 9
+#Consolas 10
+#BaseMono Medium Italic 10
+
+export GTK2_RC_FILES="/opt/docs/gtkrc-bg"  
+SETUP=$(yad --geometry=650x300+30+70 --borders 5 --title="Keyboard Shortcuts" \
+--text="<span size='large' foreground='#440039'><b>\t\t\t\t\t\t\tKeyboard Shortcuts </b></span>  \n  <span foreground='#0B6B60'><b>Show this dialog again by pressing Alt + K  or  run from Menu > Settings > Openbox Keybinds Info \n  Click 'Set Keybinds' to set or run from Menu: Settings > Openbox Key bindings</b></span>" \
+--form \
+--field="<span rise='5000' font='NK57 Monospace Italic Condensed 11' foreground='#2E0042'>$(cat $HOME/.config/openbox/keybindlist | grep -v "### " | column -t -s '|' | awk -v cols=2 '{printf("%-58s",$0)} NR%cols==0 {print ""} END {print ""}')</span>:BTN" "" \
+--field=" Show this dialog at login:CHK" "$SHOW" \
+--button="gtk-edit:/bin/bash -c edit_shortcuts" --button="Set Keybinds!/usr/share/pixmaps/obkey.png:obkey" --button="gtk-close:0" \
+--buttons-layout=spread --undecorated)
+
+export NOSHOW="`echo $SETUP | cut -d "|" -f 2`"
+
+if [ "$NOSHOW" = "FALSE" ]; then
+chmod -x "$HOME/Startup/keyshortcuts"
+else
+chmod +x "$HOME/Startup/keyshortcuts"
+fi
+
+else
+    echo 
+    exit 1
+fi
+

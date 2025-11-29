@@ -1,0 +1,26 @@
+timeout 10
+default 0
+
+title DebianDog - changes to /live savefolder 
+ root (hd0,0)
+ kernel /live/vmlinuz1 from=/fossa_dog noauto changes=/live
+ initrd /live/initrd1.xz
+
+title DebianDog - save at shutdown /live savefolder 
+ root (hd0,0)
+ kernel /live/vmlinuz1 from=/ noauto changes=EXIT:/live
+ initrd /live/initrd1.xz
+
+title DebianDog - savefile: /live/changes.dat 
+ root (hd0,0)
+ kernel /live/vmlinuz1 from=/ noauto changes=/live/changes.dat
+ initrd /live/initrd1.xz
+
+title Puppy Bionic in bpup
+root (hd0,0)
+  kernel /bpup/vmlinuz1 pmedia=ataflash psubdir=bpup  pfix=fsck,copy
+  initrd /bpup/initrd.gz
+
+title Load BOOTMGR of Windows 10
+root (hd0,0)
+chainloader /bootmgr

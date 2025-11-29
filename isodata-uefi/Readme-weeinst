@@ -1,0 +1,14 @@
+Contents :
+- weeinst, script to install grub4dos bootloader
+- wee.mbr (for writing the MBR)
+- grldr (grub4dos bootloader)
+- menu.lst with example entries, see below
+- this Readme
+
+Run weeinst for making the drive bootable (grub4dos). Run from terminal in this directory:
+E.g. from /mnt/sda1 or /mnt/sdb1
+./weeinst
+
+menu.lst included with concept entries for DebianDog, Puppy and Windows.
+The entries for savefolder will only work if install is on ext (Linux) filesytem.
+

@@ -1,0 +1,13 @@
+# Remove this file to restore default settings.
+
+docsBrowser = /usr/local/bin/mtpaint-help
+docsLocation = /usr/local/bin/mtpaint-help
+window_w = 757
+window_h = 550
+file1 = /mnt/sda6/01-repos/gif/test-0000.gif
+last_dir = /mnt/sda6/01-repos/gif
+file20 = .
+fpick_dir_0 = /mnt/sda6/01-repos/gif/
+fpick_col2 = 78
+window_x = 379
+window_y = 81

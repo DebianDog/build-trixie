@@ -1,0 +1,20 @@
+#!/bin/sh
+#Thunar --daemon &
+#xfdesktop &
+#xfce4-panel &
+chpupsocket $USER:$USER &
+[ $(pidof pcmanfm) ] && killall -9 pcmanfm
+pcmanfm --desktop &
+sleep 2
+lxpanel &
+#xfce4-clipman &
+sleep 2
+#frisbee-tray &
+if [ -f /mnt/live/tmp/modules ]; then
+conky -c ~/.conkyrc-port &
+else
+conky -c ~/.conkyrc-live &
+fi
+#wait $!
+alsamixertray &
+#volumeicon

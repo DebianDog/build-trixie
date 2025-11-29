@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Set Wallpaper
+Comment=Set wallpaper
+Icon=nitrogen
+Exec=setwallpaper
+Terminal=false
+StartupNotify=false
+Type=Application
+Categories=Settings
+GenericName=Set Wallpaper

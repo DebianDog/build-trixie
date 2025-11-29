@@ -1,0 +1,57 @@
+#!/bin/bash
+#set -x
+
+export LANG=C
+hdrv=$(cat /mnt/live/etc/homedrv | cut -d'/' -f3)
+HDRV=$(cat '/var/log/porteus-livedbg' | grep -A1 "# Booting device:" | tail -n1)
+#[ -d /mnt/live/$HDRV ] && ln -snf /mnt/live/$HDRV /mnt/home || ln -snf $HDRV /mnt/home
+
+if grep -q noauto /proc/cmdline; then
+mkdir -p /mnt/$hdrv
+mount /dev/$hdrv /mnt/$hdrv
+ln -snf $HDRV /mnt/home
+else
+  if [ "$(uname -m)" = "i686" ]; then
+  mkdir -p /mnt/live/mnt/$hdrv
+  mount /dev/$hdrv /mnt/live/mnt/$hdrv
+  ln -snf $HDRV /mnt/home
+  else
+  ln -snf $HDRV /mnt/home
+  fi
+fi
+
+# get the partition where the save storage is located (if other than booting device)
+if grep -q noauto /proc/cmdline; then
+CDEV=$(cat /mnt/live/tmp/cdev 2> /dev/null)
+else
+  if findmnt | grep -q "/mnt/live/memory/images/changes-exit"; then
+CDEV=$(findmnt | grep "/mnt/live/memory/images/changes-exit" | awk '{print $3}'| sed 's#[][]##g' | cut -d'/' -f3)
+  else
+CDEV=$(findmnt | grep "/mnt/live/memory/changes" | awk '{print $3}'| sed 's#[][]##g' | cut -d'/' -f3)
+  fi
+fi
+
+# mount CDEV
+if [ "$CDEV" ]; then
+ if [ "$CDEV" != "memory" ] && [ "$CDEV" != "$hdrv" ]; then
+ mkdir -p /mnt/$CDEV
+ mount /dev/$CDEV /mnt/$CDEV
+ fi
+fi
+
+ln -snf /mnt/live/memory/changes /live/cow
+ln -snf /mnt/home /live/image
+(if [ -f /mnt/live/tmp/changes-exit ]; then ln -snf /mnt/live/memory/images/changes-exit /mnt/saved; else ln -snf /mnt/live/memory/changes /mnt/saved; fi) &
+
+if grep -qv noswap /proc/cmdline; then
+  echo "LOAD SWAP"
+  for ONESWAP in `fdisk -l 2> /dev/null | grep ' Linux swap'  | cut -f 1 -d ' ' | tr '\n' ' '`
+  do
+    echo -n "Loading swap partition $ONESWAP..." >/dev/console
+    swapon $ONESWAP
+
+    [ $? -eq 0 ] && SWAPON="yes"
+  done
+fi
+
+exit 0

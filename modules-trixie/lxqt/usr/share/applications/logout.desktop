@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Exec=obshutdown
+Icon=gnomeshutdown.png
+StartupNotify=false
+Terminal=false
+Categories=Utility;
+Name=Logout
+Name[nl]=Uitloggen
+NotShowIn=JWM
+
+

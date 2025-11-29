@@ -1,0 +1,197 @@
+<?xml encoding="UTF-8" version="1.0"?>
+<actions>
+<action>
+	<icon>utilities-terminal</icon>
+	<name>Open Terminal Here</name>
+	<unique-id>1424354227747322-1</unique-id>
+	<command>exo-open --working-directory %f --launch TerminalEmulator</command>
+	<description>Example for a custom action</description>
+	<patterns>*</patterns>
+	<directories/>
+</action>
+<action>
+	<icon>geany_copy</icon>
+	<name>Open with Geany</name>
+	<unique-id>1424354227747386-2</unique-id>
+	<command>geany %f</command>
+	<description></description>
+	<patterns>*</patterns>
+	<other-files/>
+	<text-files/>
+</action>
+<action>
+	<icon>important</icon>
+	<name>Remove Permanently</name>
+	<unique-id>1424354227747424-3</unique-id>
+	<command>rm-perm %F</command>
+	<description></description>
+	<patterns>*</patterns>
+	<directories/>
+	<audio-files/>
+	<image-files/>
+	<other-files/>
+	<text-files/>
+	<video-files/>
+</action>
+<action>
+	<icon>application-x-gnome-saved-search</icon>
+	<name>How Big?</name>
+	<unique-id>1424354227747465-4</unique-id>
+	<command>du -chs --apparent-size %N | sort -h  | yad --width=300 --height=400 --text-info --tail --center</command>
+	<description></description>
+	<patterns>*</patterns>
+	<directories/>
+	<audio-files/>
+	<image-files/>
+	<other-files/>
+	<text-files/>
+	<video-files/>
+</action>
+<action>
+	<icon>gdmap_icon</icon>
+	<name>Graphical Disk Map</name>
+	<unique-id>1424354227747497-5</unique-id>
+	<command>gdmap -f %f</command>
+	<description>Inspect the size of a folder</description>
+	<patterns>*</patterns>
+	<directories/>
+</action>
+<action>
+	<icon>spacefm-find</icon>
+	<name>Search</name>
+	<unique-id>1424354227747528-6</unique-id>
+	<command>pfind -d %f</command>
+	<description></description>
+	<patterns>*</patterns>
+	<directories/>
+</action>
+<action>
+	<icon>gnome-mime-application-vnd.rn-realmedia</icon>
+	<name>Video to Audio extract</name>
+	<unique-id>1424354227747563-7</unique-id>
+	<command>video2audio-x %F</command>
+	<description></description>
+	<patterns>*</patterns>
+	<audio-files/>
+	<video-files/>
+</action>
+<action>
+	<icon>application-x-xzm</icon>
+	<name>Activate module</name>
+	<unique-id>1424354227747595-8</unique-id>
+	<command>loadmodule -a %f</command>
+	<description></description>
+	<patterns>*.xzm;*.squashfs;*.sfs</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>application-x-xzm</icon>
+	<name>Activate module (safe mode)</name>
+	<unique-id>1424354227747631-9</unique-id>
+	<command>loadmodule -ano %f</command>
+	<description>Activates module without overwriting anything</description>
+	<patterns>*.xzm;*.squashfs;*.sfs</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>application-x-xzm</icon>
+	<name>Deactivate module</name>
+	<unique-id>1424354227747664-10</unique-id>
+	<command>loadmodule -d %f</command>
+	<description></description>
+	<patterns>*.xzm;*.squashfs;*.sfs</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>application-x-squashfs</icon>
+	<name>Create Squashfs</name>
+	<unique-id>1472389472683874-1</unique-id>
+	<command>cr-squash %f</command>
+	<description></description>
+	<patterns>*</patterns>
+	<directories/>
+</action>
+<action>
+	<icon>deb</icon>
+	<name>Build deb</name>
+	<unique-id>1424354227747747-12</unique-id>
+	<command>make-deb-package %f </command>
+	<description></description>
+	<patterns>*</patterns>
+	<directories/>
+</action>
+<action>
+	<icon>loadsfs</icon>
+	<name>Load-sfs-chroot full install</name>
+	<unique-id>1424354227747822-14</unique-id>
+	<command>loadsfs-fuse %f</command>
+	<description>Temporary load a module from full or frugal install</description>
+	<patterns>*.squashfs;*.sfs;*.xzm</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>pet</icon>
+	<name>Convert pet to deb</name>
+	<unique-id>1424354227747855-15</unique-id>
+	<command>pet2deb-convert %f</command>
+	<description></description>
+	<patterns>*.pet</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>pet</icon>
+	<name>Convert all .pet packages inside to deb</name>
+	<unique-id>1424354227747886-16</unique-id>
+	<command>pet2deb-dir-convert %f</command>
+	<description></description>
+	<patterns>*</patterns>
+	<directories/>
+</action>
+<action>
+	<icon>pet</icon>
+	<name>Convert pet to sfs</name>
+	<unique-id>1424354227747917-17</unique-id>
+	<command>pet2sfs-convert %f</command>
+	<description></description>
+	<patterns>*.pet</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>pet</icon>
+	<name>Convert all .pet packages inside to sfs</name>
+	<unique-id>1424354227747962-18</unique-id>
+	<command>pet2sfs-dir-convert %f</command>
+	<description></description>
+	<patterns>*</patterns>
+	<directories/>
+</action>
+<action>
+	<icon>xfce4-terminal</icon>
+	<name>Run in terminal</name>
+	<unique-id>1424424459655370-1</unique-id>
+	<command>xfce4-terminal -x %f</command>
+	<description></description>
+	<patterns>*</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>video-x-generic</icon>
+	<name>Convert short video to animated gif</name>
+	<unique-id>1493119817775816-3</unique-id>
+	<command>gifenc %f</command>
+	<description></description>
+	<patterns>*</patterns>
+	<video-files/>
+</action>
+<action>
+	<icon>spacefm-root</icon>
+	<name>Open as Root</name>
+	<unique-id>1506624008226924-2</unique-id>
+	<command>gsu thunar %f</command>
+	<description>Open as root</description>
+	<patterns>*</patterns>
+	<directories/>
+	<other-files/>
+	<text-files/>
+</action>
+</actions>

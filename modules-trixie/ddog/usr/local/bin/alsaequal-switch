@@ -1,0 +1,13 @@
+#!/bin/bash
+
+if [ ! -f $HOME/.asoundrc ] || [ -z "$(grep "# alsa_equalizer_debdog" $HOME/.asoundrc 2> /dev/null)" ]; then
+yad --text="  Alsa Equalizer is currently not enabled. \n  You want to enable it? " --title="Alsa Equalizer"
+ret=$?
+[[ $ret -ne 0 ]] && exit
+cp -a /opt/conf/.asoundrc $HOME/
+elif [ -n "$(grep "# alsa_equalizer_debdog" $HOME/.asoundrc 2> /dev/null)" ]; then
+yad --text="  Alsa Equalizer is currently enabled. \n  You want to disable it? " --title="Alsa Equalizer"
+ret=$?
+[[ $ret -ne 0 ]] && exit
+rm -f $HOME/.asoundrc
+fi

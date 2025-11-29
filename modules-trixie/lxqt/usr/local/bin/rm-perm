@@ -1,0 +1,16 @@
+#!/bin/bash
+
+[ "`whoami`" != "root" ] && exec gsu ${0} "$@"
+
+yad --center --image=important --text " Remove selected permanently ? "
+if [[ $? == 0 ]] ; then
+for arg in "$@" ; do 
+rm -r -f "$arg"
+done 
+fi
+
+
+
+
+
+

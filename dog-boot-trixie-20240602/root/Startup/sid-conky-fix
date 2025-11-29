@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if cat /etc/debian_version | grep -q sid ; then
+if grep -q 'Bullseye $nodename on $machine' $HOME/.conkyrc-port; then sed -i 's/Bullseye/Sid/' $HOME/.conkyrc-port; fi
+if grep -q 'Bullseye $nodename on $machine' $HOME/.conkyrc-live; then sed -i 's/Bullseye/Sid/' $HOME/.conkyrc-live; fi
+fi
+
+

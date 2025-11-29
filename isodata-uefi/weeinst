@@ -1,0 +1,59 @@
+#!/bin/bash
+
+EXTMOUNT=`cd ./ ; pwd`
+MBR_DEV=`grep "$EXTMOUNT" /etc/mtab | sed 's|\ .*||g' | sed 's/.$//'`
+
+if [ "$MBR_DEV" = "" ]; then
+MBR_DEV=`grep "$EXTMOUNT" /proc/mounts | sed 's|\ .*||g' | sed 's/.$//'`
+	if [ "$MBR_DEV" = "" ]; then
+echo "Hmm.... Not found any disk record of "$EXTMOUNT" in /etc/mtab and /proc/mounts."
+echo "MBR not installed. Exiting..."
+exit
+	fi
+fi
+
+PART=$(basename "$EXTMOUNT")
+
+DRV=`echo $MBR_DEV | sed 's|/dev/||g'`
+
+set_bootflag () {
+ # Set boot flag (needs to be removed first if it's present) Terry version - PARTNUM=`echo $PART | cut -c4`
+ PARTNUM=$(echo "$PART" | grep -Eo "[[:digit:]]*$") # mcewanw change
+ for n in /dev/${DRV}* ; do
+  if [ "`fdisk -l /dev/$DRV | grep $n | awk '{ print $2 }'`" = "*" ]; then
+   echo part=$n
+   #PNUM=`echo $n | cut -c9` # Terry
+   PNUM=$(echo "$n" | grep -Eo "[[:digit:]]*$") # mcewanw change
+   echo pnum=$PNUM
+   echo -e "a\n${PNUM}\nw" | fdisk /dev/${DRV} >/dev/null 2>&1
+  fi
+ done
+ echo -e "a\n${PARTNUM}\nw" | fdisk /dev/${DRV} >/dev/null 2>&1
+}
+export -f set_bootflag
+
+rm -f /tmp/wee.mbr
+cp -a ./wee.mbr /tmp/wee.mbr
+# Read disk signature and partition table from MBR_DEV
+# and write it to wee.mbr:
+dd if=$MBR_DEV bs=1 skip=439 count=72 2>/dev/null | \
+	dd of=/tmp/wee.mbr bs=1 seek=439 conv=notrunc 2>/dev/null
+
+# Back up the sectors about to be overwritten, just in case:
+dd if=$MBR_DEV of=$PWD/$(basename $MBR_DEV).63s bs=512 count=63 2>/dev/null
+
+# Write wee MBR to $MBR_DEV
+dd if=/tmp/wee.mbr of=$MBR_DEV 2>/dev/null
+
+cat <<EOF
+Wee has been installed to '$MBR_DEV'
+
+Note: Your old MBR was backed up to '$PWD/$(basename $MBR_DEV).63s'
+If something went wrong, you can restore it with:
+  cat $PWD/$(basename $MBR_DEV).63s > $MBR_DEV
+
+EOF
+
+set_bootflag
+
+exit 0

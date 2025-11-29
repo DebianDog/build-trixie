@@ -1,0 +1,25 @@
+#!/bin/bash
+
+if [ "$(pidof tint2)" ]; then
+pidtint2vert="`ps -eo pid,cmd | grep -v grep | grep "tint2 -c $HOME/.config/tint2/tint2rcl" | awk '{ print $1 }'`"
+    killall tint2
+    kill -9 $pidtint2vert 2> /dev/null
+ sleep 1
+tint2 &
+sleep 1
+
+[ "$pidtint2vert" ] && tint2 -c $HOME/.config/tint2/tint2rcl &
+	disown
+    exit
+else
+
+    tint2 &
+sleep 1
+pidtint2vert="`ps -eo pid,cmd | grep -v grep | grep "tint2 -c $HOME/.config/tint2/tint2rcl" | awk '{ print $1 }'`"
+[ "$pidtint2vert" ] && tint2 -c $HOME/.config/tint2/tint2rcl &
+	disown
+   exit
+fi
+exit
+
+

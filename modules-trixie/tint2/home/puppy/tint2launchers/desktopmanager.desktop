@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Desktop Manager
+Comment=Desktop Manager
+Icon=user-desktop
+Exec=ob-desktop
+Terminal=false
+StartupNotify=false
+Type=Application
+Categories=Settings;
+GenericName=Desktop Manager

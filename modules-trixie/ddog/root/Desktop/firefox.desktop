@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Browse
+Comment=
+Exec=firefox
+Icon=firefox-esr
+Path=
+Terminal=false
+StartupNotify=false
+Categories=Network;

@@ -1,0 +1,9 @@
+
+# Set the desktop background and icons
+# Checks in the background for changed wallpaper (for conky background)
+setbackdrop &
+
+# Rox pinboard
+/usr/bin/rox -p ${HOME}/.config/rox.sourceforge.net/ROX-Filer/pinbd-OB &
+# Bottom panel
+tint2 &

@@ -373,18 +373,19 @@ fi
 # create build_info.txt and build_setup.conf
 cr_build_info
 
-[ "$ISOUEFI" = "TRUE" ] && tar -zxf ../isodata-trixie-uefi.tar.gz || tar -zxf ../isodata-trixie.tar.gz
+#[ "$ISOUEFI" = "TRUE" ] && tar -zxf ../isodata-trixie-uefi.tar.gz || tar -zxf ../isodata-trixie.tar.gz
+[ "$ISOUEFI" = "TRUE" ] && cp -a ../isodata-uefi isodata || cp -a ../isodata isodata
 ok_or_failed
 
-echo -e "\e[0;36mExtracting...\033[0m"
-tar -zxf ../dog-boot-trixie-20240602.tar.gz
+#echo -e "\e[0;36mExtracting...\033[0m"
+#tar -zxf ../dog-boot-trixie-20240602.tar.gz
 echo -e "\e[0;36mCopy scripts, required for porteus-boot, to the chroot...\033[0m"
-cp -af dog-boot-trixie-20240602/* chroot/
+cp -af ../dog-boot-trixie-20240602/* chroot/
 ok_or_failed
 
-tar -zxf ../initrdport-bullseye.tar.gz
-echo -e "\e[0;36mCopy initrd skeleton, required for porteus-boot, to chroot/tmp ...\033[0m"
-cp -af initrdport-bullseye chroot/tmp/  # copy initrd skeleton to chroot/tmp/
+echo -e "\e[0;36mExtract initrd skeleton, required for porteus-boot, to chroot/tmp ...\033[0m"
+tar -zxf ../initrdport-bullseye.tar.gz -C chroot/tmp
+#cp -af initrdport-bullseye chroot/tmp/  # copy initrd skeleton to chroot/tmp/
 ok_or_failed
 
 echo -e "\e[0;36mCopy .deb packages from ../debs (if existing) to chroot/tmp/...\033[0m"
@@ -630,6 +631,8 @@ echo -e "\e[0;36mmake /bin/sh symlink to bash instead of default dash\033[0m"
 echo "dash dash/sh boolean false" | debconf-set-selections
 DEBIAN_FRONTEND=noninteractive dpkg-reconfigure dash
 
+STATPUPPY=$(stat -c "%U %G" /home/puppy)
+[ "$STATPUPPY" != "puppy puppy" ] && chown -R puppy:puppy /home/puppy
 
 ############ Start installing packages ############
 
@@ -835,18 +838,25 @@ mv chroot/tmp/tmpapt/boot/config-* $kernel/boot/
 rm -fr chroot/tmp/*
 echo
 
-# Extract extra squashfs modules if DE config is set
-echo -e "\e[0;36mIf configured, extract extra .squashfs modules...\033[0m"
+# Copy extra if DE config is set
+echo -e "\e[0;36mIf configured DE_CONFIG, copy from modules-trixie...\033[0m"
 
-[ "$DE_CONFIG" = "Xfce4" ] && unsquashfs -f -d chroot ../modules-trixie/xfce4//*.squashfs 
-#[ "$DE_CONFIG" = "Jwm" ] && unsquashfs -f -d chroot ../modules-trixie/jwm/*.squashfs
-[ "$DE_CONFIG" = "Mate" ] && unsquashfs -f -d chroot ../modules-trixie/mate/*.squashfs
-[ "$DE_CONFIG" = "Lxqt" ] && unsquashfs -f -d chroot ../modules-trixie/lxqt/*.squashfs
-[ "$DE_CONFIG" = "Lxqt_Full" ] && unsquashfs -f -d chroot ../modules-trixie/lxqt/*.squashfs
-[ "$DE_CONFIG" = "DDog" ] && unsquashfs -f -d chroot ../modules-trixie/ddog/*.squashfs
-[ "$DE_CONFIG" = "ObDog" ] && unsquashfs -f -d chroot ../modules-trixie/obdog/*.squashfs
-[ "$DE_CONFIG" = "ChromeDog" ] && unsquashfs -f -d chroot ../modules-trixie/chromedog/*.squashfs
-[ "$DE_CONFIG" = "Tint2" ] && unsquashfs -f -d chroot ../modules-trixie/tint2/*.squashfs
+#[ "$DE_CONFIG" = "Xfce4" ] && unsquashfs -f -d chroot ../modules-trixie/xfce4/*.squashfs
+[ "$DE_CONFIG" = "Xfce4" ] && cp -af ../modules-trixie/xfce4/* chroot/
+#[ "$DE_CONFIG" = "Mate" ] && unsquashfs -f -d chroot ../modules-trixie/mate/*.squashfs
+[ "$DE_CONFIG" = "Mate" ] && cp -af ../modules-trixie/mate/* chroot/
+#[ "$DE_CONFIG" = "Lxqt" ] && unsquashfs -f -d chroot ../modules-trixie/lxqt/*.squashfs
+[ "$DE_CONFIG" = "Lxqt" ] && cp -af ../modules-trixie/lxqt/* chroot/
+#[ "$DE_CONFIG" = "Lxqt_Full" ] && unsquashfs -f -d chroot ../modules-trixie/lxqt/*.squashfs
+[ "$DE_CONFIG" = "Lxqt_Full" ] && cp -af ../modules-trixie/lxqt/* chroot/
+#[ "$DE_CONFIG" = "DDog" ] && unsquashfs -f -d chroot ../modules-trixie/ddog/*.squashfs
+[ "$DE_CONFIG" = "DDog" ] && cp -af ../modules-trixie/ddog/* chroot/ 
+#[ "$DE_CONFIG" = "ObDog" ] && unsquashfs -f -d chroot ../modules-trixie/obdog/*.squashfs
+[ "$DE_CONFIG" = "ObDog" ] && cp -af ../modules-trixie/obdog/* chroot/ 
+#[ "$DE_CONFIG" = "ChromeDog" ] && unsquashfs -f -d chroot ../modules-trixie/chromedog/*.squashfs
+ [ "$DE_CONFIG" = "ChromeDog" ] && cp -af ../modules-trixie/chromedog/* chroot/
+#[ "$DE_CONFIG" = "Tint2" ] && unsquashfs -f -d chroot ../modules-trixie/tint2/*.squashfs
+[ "$DE_CONFIG" = "Tint2" ] && cp -af ../modules-trixie/tint2/* chroot/
 
 echo -e "\e[0;36mCopy contents (if exist) of rootcopy directory...\033[0m"
 find ../rootcopy -mindepth 1 ! -name ReadMe -exec cp -af "{}" chroot/ \; 2> /dev/null

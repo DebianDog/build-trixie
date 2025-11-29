@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ "`whoami`" != "root" ]; then
+xterm -e sudo video2audio-x "$@"
+exit 0
+fi
+
+xterm -e video2audio-x "$@"

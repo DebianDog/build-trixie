@@ -1,0 +1,92 @@
+#!/bin/sh
+ 
+[ "`whoami`" != "root" ] && exec gsu ${0}
+#[ "`whoami`" != "root" ] && exec xterm -geometry 25x3 -e "su - root -c ${0}"
+dpkg --purge `dpkg --get-selections | grep deinstall | cut -f1` 2> /dev/null
+
+l_boot() {
+if grep -qv showmounts /proc/cmdline; then
+MOD=`blkid -o list -c /dev/null | grep -P "squashfs" | grep "(in use)" | awk '{print $1}'`
+for i in $MOD
+do
+MNT=$(echo $i | sed 's,/dev/,,g')
+#echo ${MNT}_
+mkdir /live/${MNT}_ 2> /dev/null
+mount -o loop $i /live/${MNT}_
+done
+fi
+
+# Move all files from info-new contents of all modules to /var/lib/dpkg/info
+mv /var/lib/dpkg/info-new/* /var/lib/dpkg/info
+# ------------------------------------------------------
+# Start Section available.
+# Find all availablenew files from all loaded modules created by remastercow:
+fndavail=$(find $(ls -d -1 /live/*/var/lib/dpkg) \( ! -name image \) -type f -name 'availablenew')
+
+# Merge all found availablenew with /var/lib/dpkg/available to new file: /tmp/available.new
+cat $fndavail /var/lib/dpkg/available >> /tmp/available.new
+
+# Backup original available file. 
+mv /var/lib/dpkg/available /var/lib/dpkg/availableorig
+
+# Remove duplicate package entries in /tmp/available.new and create /var/lib/dpkg/available.
+awk '/^Package:/{p=!($0 in a);a[$0]}p' /tmp/available.new > /var/lib/dpkg/available
+# End Section available.
+
+#############################################################################
+
+# Start Section status.
+# Find all statusnew files from all loaded modules created by remastercow:
+fndstatus=$(find $(ls -d -1 /live/*/var/lib/dpkg) \( ! -name image \) -type f -name 'statusnew')
+
+# Merge all found statusnew with /var/lib/dpkg/status to new file: /tmp/status.new
+cat $fndstatus /var/lib/dpkg/status >> /tmp/status.new
+
+# Backup original status file. 
+mv /var/lib/dpkg/status /var/lib/dpkg/statusorig
+
+# Remove duplicate package entries in /tmp/status.new and create /var/lib/dpkg/status.
+awk '/^Package:/{p=!($0 in a);a[$0]}p' /tmp/status.new > /var/lib/dpkg/status
+# End Section status.
+}
+
+p_boot() {
+# Move all files from info-new contents of all modules to /var/lib/dpkg/info
+mv /var/lib/dpkg/info-new/* /var/lib/dpkg/info
+# ------------------------------------------------------
+# Start Section available.
+# Find all availablenew files from all loaded modules created by remastercow:
+fndavail=$(find $(ls -d -1 /mnt/live/memory/images/*/var/lib/dpkg) -type f -name  'availablenew')
+
+# Merge all found availablenew with /var/lib/dpkg/available to new file: /tmp/available.new
+cat $fndavail /var/lib/dpkg/available >> /tmp/available.new
+
+# Backup original available file. 
+mv /var/lib/dpkg/available /var/lib/dpkg/availableorig
+
+# Remove duplicate package entries in /tmp/available.new and create /var/lib/dpkg/available.
+awk '/^Package:/{p=!($0 in a);a[$0]}p' /tmp/available.new > /var/lib/dpkg/available
+# End Section available.
+
+#############################################################################
+
+# Start Section status.
+# Find all statusnew files from all loaded modules created by remastercow:
+fndstatus=$(find $(ls -d -1 /mnt/live/memory/images/*/var/lib/dpkg) -type f -name  'statusnew')
+
+# Merge all found statusnew with /var/lib/dpkg/status to new file: /tmp/status.new
+cat $fndstatus /var/lib/dpkg/status >> /tmp/status.new
+
+# Backup original status file. 
+mv /var/lib/dpkg/status /var/lib/dpkg/statusorig
+
+# Remove duplicate package entries in /tmp/status.new and create /var/lib/dpkg/status.
+awk '/^Package:/{p=!($0 in a);a[$0]}p' /tmp/status.new > /var/lib/dpkg/status
+# End Section status.
+}
+
+if [ -f /mnt/live/tmp/modules ]; then
+p_boot
+else
+l_boot
+fi

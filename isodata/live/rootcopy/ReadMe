@@ -1,0 +1,6 @@
+Folders/files added in rootcopy will be copied to the filesystem.
+Create a folder structure e.g. usr/bin/ , usr/local/bin , usr/share/ or root/ with file(s) inside.
+
+Note: all existing files will be overwritten by these ! (also what's included in the save storage)
+
+

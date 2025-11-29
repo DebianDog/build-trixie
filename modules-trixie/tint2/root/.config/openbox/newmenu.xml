@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<openbox_menu>
+
+<menu id="debdog-screenshot" label="Screenshot">
+  <item label="Now">
+    <action name="Execute">
+      <command>scrot debdog-%Y%m%d%H%M%S.jpg</command>
+    </action>
+  </item>
+  <item label="In 5 Seconds...">
+    <action name="Execute">
+      <command>scrot -d 5 debdog-%Y%m%d%H%M%S.jpg</command>
+    </action>
+  </item>
+  <item label="In 10 Seconds...">
+    <action name="Execute">
+      <command>scrot -d 10 debdog-%Y%m%d%H%M%S.jpg</command>
+    </action>
+  </item>
+  <item label="Selected Area...">
+    <action name="Execute">
+      <command>scrot -s debdog-%Y%m%d%H%M%S.jpg</command>
+    </action>
+  </item>
+  <item label="Selected Area in 5 seconds...">
+    <action name="Execute">
+      <command>scrot -s -d 5 debdog-%Y%m%d%H%M%S.jpg</command>
+    </action>
+  </item>
+</menu>
+<menu id="debdog-openbox" label="Openbox">
+ <menu id="debdog-openbox-tint2" label="Tint2 panel">
+    <item label="Edit config file">
+      <action name="Execute">
+        <command>leafpad ~/.config/tint2/tint2rc</command>
+      </action>
+    </item>
+    <item label="Restart tint2">
+      <action name="Execute">
+        <command>tint2restart</command>
+      </action>
+    </item>
+    <separator label="themes"/>
+    <item label="Default">
+      <action name="Execute">
+        <command>tint2theme bottom</command>
+      </action>
+    </item>
+    <item label="Gaia 10 Mod">
+      <action name="Execute">
+        <command>tint2theme gaia10</command>
+      </action>
+    </item>
+    <item label="Crunchbang">
+      <action name="Execute">
+        <command>tint2theme crunchbang</command>
+      </action>
+    </item>
+  </menu>
+  <item label="GUI Config">
+    <action name="Execute">
+      <command>obconf</command>
+    </action>
+  </item>
+  <item label="Autostart Config">
+    <action name="Execute">
+      <command>leafpad ~/.config/openbox/autostart.sh</command>
+    </action>
+  </item>
+  <item label="Reconfigure">
+    <action name="Reconfigure"/>
+  </item>
+  <item label="Restart">
+    <action name="Restart"/>
+  </item>
+</menu>
+<!-- <menu id="debdog-readme" label="Readme">
+  <item label="Installing MintPup">
+    <action name="Execute">
+      <command>leafpad /opt/docs/installation</command>
+    </action>
+  </item>
+  <item label="Desktop Configuration">
+    <action name="Execute">
+      <command>leafpad /opt/docs/settings</command>
+    </action>
+  </item>
+</menu> -->
+
+<menu id="desktop-app-menu-lxde" label="Openbox 3">
+  <separator label="Openbox Menu"/>
+  <menu id="desktop-app-menu" label="Applications" execute="openbox-menu ddog-applications.menu" icon="/usr/share/icons/Faenza/places/64/start-here-gnome.png"/>
+  <separator />
+  <menu id="client-list-menu" 
+icon="/usr/share/pixmaps/user-desktop.png"/>
+  <separator />
+      <item label="Desktop Manager    " icon="/usr/share/pixmaps/u-desktop.png">
+    <action name="Execute">
+      <command>ob-desktop</command>
+    </action>
+  </item>
+  <item label="Terminal" icon="/usr/share/icons/Faenza/apps/64/utilities-terminal.png">
+    <action name="Execute">
+      <command>xterm</command>
+    </action>
+  </item>
+  <item label="Text Editor" icon="/usr/share/icons/Faenza/apps/64/leafpad.png">
+    <action name="Execute">
+      <command>leafpad</command>
+    </action>
+  </item>
+  <item label="File Manager" icon="/usr/share/icons/Faenza/apps/64/system-file-manager.png">
+    <action name="Execute">
+      <command>Thunar</command>
+    </action>
+  </item>
+  <item label="Web Browser" icon="/usr/share/icons/Faenza/apps/64/web-browser.png">
+    <action name="Execute">
+      <command>defaultbrowser</command>
+    </action>
+  </item>
+    <item label="Set Wallpaper" icon="/usr/share/icons/hicolor/48x48/apps/nitrogen.png">
+    <action name="Execute">
+      <command>/usr/local/bin/setwallpaper</command>
+    </action>
+  </item>
+  <separator/>
+  <menu id="debdog-screenshot" icon="/usr/share/icons/Faenza/devices/64/camera-photo.png"/>
+  <menu id="debdog-openbox" icon="/usr/share/icons/Faenza/apps/64/gnome-session.png"/>
+  <menu id="debdog-readme" icon="/usr/share/icons/Faenza/mimetypes/64/text-plain.png"/>
+  <separator/>
+  <item label="Logout" icon="/usr/share/icons/Faenza/apps/64/gnome-logout.png">
+    <action name="Execute">
+      <command>obshutdown</command>
+    </action>
+  </item>
+</menu>
+
+-</openbox_menu>

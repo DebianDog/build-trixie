@@ -1,0 +1,38 @@
+conky.config = {
+-- Performance Settings
+	update_interval = 1,
+	double_buffer = true,
+	no_buffers = true,
+	background = false,
+
+-- Window Settings
+	own_window = true,
+	own_window_transparent = true,
+own_window_argb_visual = true,
+--own_window_argb_value = '255',
+	own_window_type = 'normal',
+	own_window_hints = 'undecorated,below,sticky,skip_taskbar,skip_pager',
+--disable_auto_reload 1
+
+-- Window border
+	draw_shades = false,
+-- draw_borders yes
+	draw_graph_borders = false,
+
+-- Size and position
+	minimum_width = 260, minimum_height = 260,
+	maximum_width = 260,
+	gap_x = 230 ,
+	gap_y = 0 ,
+	alignment = 'top_right',
+
+-- Lua
+	lua_load = '~/.conky/analog_clock1/cairo_clock.lua',
+	lua_draw_hook_post = 'cairo_clock actuel 225 140 130',
+};
+
+conky.text = [[
+#${lua cairo_clock actuel 256 150 150}
+#${execpi 900 ~/.conky/analog_clock1/choice.sh}
+${if_match ${exec echo $(($(date -d 'tomorrow 00:00:00' +%s) - $(date +%s)))} == 86398}${exec ~/.conky/analog_clock1/analog1_refresh.sh}${endif}
+]];

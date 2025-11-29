@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=AlsaMixer
+Comment=
+Exec=xterm -e alsamixer
+Icon=gnome-tweak-tool
+Path=
+Terminal=false
+StartupNotify=false
+Categories=AudioVideo;Application

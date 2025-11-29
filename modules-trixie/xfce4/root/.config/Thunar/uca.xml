@@ -1,0 +1,98 @@
+<?xml encoding="UTF-8" version="1.0"?>
+<actions>
+<action>
+	<icon>utilities-terminal</icon>
+	<name>Open Terminal Here</name>
+	<unique-id>1424354227747322-1</unique-id>
+	<command>exo-open --working-directory %f --launch TerminalEmulator</command>
+	<description>Example for a custom action</description>
+	<patterns>*</patterns>
+	<directories/>
+</action>
+<action>
+	<icon>application-x-gnome-saved-search</icon>
+	<name>How Big?</name>
+	<unique-id>1424354227747465-4</unique-id>
+	<command>du -chs --apparent-size %N | sort -h  | yad --width=300 --height=400 --text-info --tail --center</command>
+	<description></description>
+	<patterns>*</patterns>
+	<directories/>
+	<audio-files/>
+	<image-files/>
+	<other-files/>
+	<text-files/>
+	<video-files/>
+</action>
+<action>
+	<icon>spacefm-find</icon>
+	<name>Search</name>
+	<unique-id>1424354227747528-6</unique-id>
+	<command>pfind -d %f</command>
+	<description></description>
+	<patterns>*</patterns>
+	<directories/>
+</action>
+<action>
+	<icon>application-x-xzm</icon>
+	<name>Activate module</name>
+	<unique-id>1424354227747595-8</unique-id>
+	<command>loadmodule -a %f</command>
+	<description></description>
+	<patterns>*.xzm;*.squashfs;*.sfs</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>application-x-xzm</icon>
+	<name>Activate module (safe mode)</name>
+	<unique-id>1424354227747631-9</unique-id>
+	<command>loadmodule -ano %f</command>
+	<description>Activates module without overwriting anything</description>
+	<patterns>*.xzm;*.squashfs;*.sfs</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>application-x-xzm</icon>
+	<name>Deactivate module</name>
+	<unique-id>1424354227747664-10</unique-id>
+	<command>loadmodule -d %f</command>
+	<description></description>
+	<patterns>*.xzm;*.squashfs;*.sfs</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>application-x-squashfs</icon>
+	<name>Create Squashfs</name>
+	<unique-id>1472389472683874-1</unique-id>
+	<command>cr-squash %f</command>
+	<description></description>
+	<patterns>*</patterns>
+	<directories/>
+</action>
+<action>
+	<icon>debian-logo</icon>
+	<name>Extract deb</name>
+	<unique-id>1424354227747697-11</unique-id>
+	<command>redeb %f</command>
+	<description></description>
+	<patterns>*.deb</patterns>
+	<other-files/>
+</action>
+<action>
+	<icon>deb</icon>
+	<name>Build deb</name>
+	<unique-id>1424354227747747-12</unique-id>
+	<command>make-deb-package %f </command>
+	<description></description>
+	<patterns>*</patterns>
+	<directories/>
+</action>
+<action>
+	<icon>deb</icon>
+	<name>Install deb(s)</name>
+	<unique-id>1424354227747778-13</unique-id>
+	<command>instdeb %F</command>
+	<description></description>
+	<patterns>*.deb</patterns>
+	<other-files/>
+</action>
+</actions>

@@ -1,0 +1,36 @@
+#!/bin/bash
+
+TINT2DIR="$HOME/.config/tint2"
+cd $TINT2DIR
+
+tint2_bottom() {
+  ln -sf tint2rc_default tint2rc
+}
+
+tint2_gaia10() {
+  ln -sf tint2rc_gaia10_mod tint2rc
+}
+
+tint2_crunchbang() {
+  ln -sf tint2rc_crunchbang tint2rc
+}
+
+
+case "$1" in
+
+  bottom)
+    tint2_bottom
+    cd --
+    tint2restart ;;
+
+  gaia10)
+    tint2_gaia10
+    cd --
+    tint2restart ;;
+  
+  crunchbang)
+    tint2_crunchbang
+    cd --
+    tint2restart ;;
+    
+esac

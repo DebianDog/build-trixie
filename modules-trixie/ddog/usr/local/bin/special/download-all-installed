@@ -1,0 +1,9 @@
+#!/bin/bash
+#Download all installed packages.
+for pkg in `dpkg --get-selections | awk '{print $1}' | egrep -v '(mysql|mythtv)'` ; do apt-get -y --force-yes install --reinstall $pkg -d ; done
+
+cd /live/image/archives # path to downloaded deb packages.
+# Extract the deb packages.
+for arg in *.deb ; do 
+dpkg -x "$arg" . 
+done

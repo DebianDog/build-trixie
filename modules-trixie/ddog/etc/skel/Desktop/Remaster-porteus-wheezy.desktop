@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Remaster
+Comment=
+Exec=remasterdog-start
+Icon=application-x-xzm
+Path=
+Terminal=false
+StartupNotify=false
+Categories=Utility;X-XFCE;X-Xfce-Toplevel;

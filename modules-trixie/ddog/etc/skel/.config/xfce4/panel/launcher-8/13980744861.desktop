@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Firefox
+Comment=
+Exec=firefox
+Icon=firefox-esr
+Path=
+Terminal=false
+StartupNotify=false
+Categories=Network;
+X-XFCE-Source=file:///root/Desktop/firefox.desktop

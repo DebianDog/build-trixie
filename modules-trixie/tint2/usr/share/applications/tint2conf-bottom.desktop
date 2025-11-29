@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+
+Name=Tint2 Settings (default bottom panel)
+
+Comment=Tool to configure the tint2 panel
+Comment[pl]=Narzędzie do konfiguracji panelu tint2 configure the tint2 panel
+Comment[ru]=Инструмент конфигурирования панели tint2
+
+Exec=tint2conf ~/.config/tint2/tint2rc
+Icon=tint2conf
+Terminal=false
+Categories=Settings;DesktopSettings;
+MimeType=application/x-tint2-theme

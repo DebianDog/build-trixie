@@ -1,0 +1,6 @@
+sleep 8
+if [ -f /mnt/live/tmp/modules ]; then
+conky -c ~/.conkyrc-port &
+else
+conky -c ~/.conkyrc-live &
+fi

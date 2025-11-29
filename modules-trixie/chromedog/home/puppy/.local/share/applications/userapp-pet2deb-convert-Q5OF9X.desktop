@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Convert pet to deb
+Exec=pet2deb-convert %f
+Categories=Other;
+NoDisplay=true
+MimeType=application/gzip
+Terminal=false
+Icon=pet

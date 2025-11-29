@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# give some time to check if /etc/timezone has changed, to update the clock of xfce4-panel
+# and then restart xfce4-panel
+# depends on tzupdate, which depend on internet connection
+#set -x
+#while pidof -x start-ntpdate; do
+#set -x
+check_tzone () {
+set -x
+ date=$(stat -c %y "$1")
+ while sleep 3; do date2=$(stat -c %y "$1")
+   if [[ $date2 != $date ]]; then echo "changed!"; break; fi
+[ -z "$(pidof -x start-ntpdate)" ] && break
+ done
+xfce4-panel -r
+}
+export -f check_tzone
+
+timeout 50 /bin/bash -c "check_tzone /etc/timezone"
+
+#sleep 3
+#done
+
+#[ $? -ne 0 ] && xfce4-panel -r

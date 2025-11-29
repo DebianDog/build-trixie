@@ -1,0 +1,33 @@
+#!/bin/bash
+
+#WALLPAPER=$(cat /root/.wallpapers/wallpapers.lst | grep "Scale \|Stretch \|Center \|Tile " | head -n1 | awk '{ print $3 }')
+BACKDROP=$(grep 'backdrop style' $HOME/.config/rox.sourceforge.net/ROX-Filer/pinbd-OB)
+WALLPAPER=$(echo "$BACKDROP" | sed 's/.*">//;s#</backdrop>##')
+SCALING=$(grep 'backdrop style' $HOME/.config/rox.sourceforge.net/ROX-Filer/pinbd-OB | grep -o 'Scaled\|Stretched\|Centred\|Tiled')
+[ "$SCALING" = "Scaled" ] && OPTION="-full"
+[ "$SCALING" = "Stretched" ] && OPTION="-fill"
+[ "$SCALING" = "Centred" ] && OPTION="-center"
+[ "$SCALING" = "Tiled" ] && OPTION="-tile"
+															
+hsetroot $OPTION "$WALLPAPER"
+
+while true; do
+BACKDROP=$(grep 'backdrop style' $HOME/.config/rox.sourceforge.net/ROX-Filer/pinbd-OB)
+WALLPAPER=$(echo "$BACKDROP" | sed 's/.*">//;s#</backdrop>##')
+
+if [[ "$OLDWALLPAPER" != "$WALLPAPER" ]]; then
+BACKDROP=$(grep 'backdrop style' $HOME/.config/rox.sourceforge.net/ROX-Filer/pinbd-OB)
+WALLPAPER=$(echo "$BACKDROP" | sed 's/.*">//;s#</backdrop>##')
+SCALING=$(grep 'backdrop style' $HOME/.config/rox.sourceforge.net/ROX-Filer/pinbd-OB | grep -o 'Scaled\|Stretched\|Centred\|Tiled')
+[ "$SCALING" = "Scaled" ] && OPTION="-full"
+[ "$SCALING" = "Stretched" ] && OPTION="-fill"
+[ "$SCALING" = "Centred" ] && OPTION="-center"
+[ "$SCALING" = "Tiled" ] && OPTION="-tile"
+
+hsetroot $OPTION "$WALLPAPER"
+fi
+
+OLDWALLPAPER=$WALLPAPER
+sleep 3
+done
+

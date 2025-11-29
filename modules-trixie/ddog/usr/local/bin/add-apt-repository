@@ -1,0 +1,39 @@
+#!/bin/bash
+
+if [ $# = 0 -o `id -u` != 0 ] || [[ "$1" == -* ]]; then
+	echo "Utility to add Ubuntu PPA in your Debian machine"
+	echo "usage: sudo ${0##*/} ppa:user/ppa-name [ubuntu_release]"
+	echo "e.g.:  sudo ${0##*/} ppa:rvm/smplayer bionic"
+	echo "If no Ubuntu release is given, the default will be 'bionic'"
+	exit 1
+fi
+
+ppa=${1#ppa:}
+ubuntu_release=${2:-bionic}
+[[ "$ppa" == */* ]] || ppa=$ppa/ppa
+ppa_user="${ppa%%/*}" ppa_archive="${ppa#*/}"
+sources_list="/etc/apt/sources.list.d/ppa_${ppa_user}_${ppa_archive}.list"
+echo "ppa:$ppa_user/$ppa_archive $ubuntu_release  ->  $sources_list"
+
+(
+set -e
+set -o pipefail
+
+echo "deb http://ppa.launchpad.net/$ppa_user/$ppa_archive/ubuntu $ubuntu_release main" \
+  >"$sources_list"
+
+key=`apt-get update 2>&1 >/dev/null | sed -n '/NO_PUBKEY/s/.* //p'`
+if [ -z "$key" ]; then
+echo "Key already added?"
+else
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys $key
+fi
+)
+
+if [ "$?" = 0 ]; then
+echo ok
+echo -e "\e[0;32mSuccess: 'http://ppa.launchpad.net/$ppa_user/$ppa_archive/ubuntu $ubuntu_release main' is added to the repositories\033[0m"
+else
+echo -e "\e[0;31mFailed to add ppa:$ppa_user/$ppa_archive\033[0m"
+rm -f "$sources_list"
+fi

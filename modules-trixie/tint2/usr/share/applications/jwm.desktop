@@ -1,0 +1,9 @@
+[Desktop Entry]
+Terminal=false
+Name=Start Jwm
+Icon=icewm_32x32.xpm
+Exec=start-jwm
+Categories=System;Window Managers;DebianDog;X-XFCE;X-Xfce-Toplevel
+Comment=Window Manager
+Type=Application
+

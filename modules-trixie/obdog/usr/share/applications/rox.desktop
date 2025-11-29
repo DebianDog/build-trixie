@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Rox Filer
+Exec=rox
+Terminal=false
+Type=Application
+StartupNotify=true
+Icon=rox.png
+Categories=Utility;System;FileManager

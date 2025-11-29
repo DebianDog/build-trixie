@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Audio-Setup
+Comment=
+Exec=gsu xterm -e '/usr/local/bin/audio-setup'
+Icon=gnome-settings
+Path=
+Terminal=false
+StartupNotify=false
+Categories=Utility;X-XFCE;X-Xfce-Toplevel;

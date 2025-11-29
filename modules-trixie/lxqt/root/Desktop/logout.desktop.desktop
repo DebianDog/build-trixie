@@ -1,0 +1,5 @@
+[Desktop Entry]
+Type=Link
+Name=Logout
+Icon=gnomeshutdown
+URL=/usr/share/applications/logout.desktop

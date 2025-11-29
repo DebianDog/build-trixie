@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Action
+Tooltip=Video to Audio extract
+Name=Video to Audio extract
+Profiles=profile-zero;
+Icon=audio-x-generic
+
+[X-Action-Profile profile-zero]
+MimeTypes=video/*;
+Exec=video2audio-x %F
+Name=Default profile

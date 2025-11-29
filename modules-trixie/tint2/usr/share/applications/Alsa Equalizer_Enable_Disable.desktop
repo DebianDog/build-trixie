@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Alsa Equalizer Enable/Disable
+Comment=Graphical audio mixer
+Exec=alsaequal-switch
+Icon=/usr/share/pixmaps/alsamixergui.xpm
+Path=
+Terminal=false
+StartupNotify=false
+Categories=Application;AudioVideo;

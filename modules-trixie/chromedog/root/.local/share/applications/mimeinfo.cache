@@ -1,0 +1,12 @@
+[MIME Cache]
+application/gzip=userapp-pet2sfs-convert-5HS48X.desktop;userapp-pet2deb-convert-Q5OF9X.desktop;
+application/x-cd-image=userapp-filemnt-FHBW4Y.desktop;
+application/x-deb=userapp-redeb-B6808X.desktop;userapp-instdeb-F47G9X.desktop;
+application/x-squashfs=userapp-filemnt-6Y7S4Y.desktop;
+application/xhtml_xml=google-chrome-root.desktop;
+image/webp=google-chrome-root.desktop;
+text/html=google-chrome-root.desktop;
+text/xml=google-chrome-root.desktop;
+x-scheme-handler/ftp=google-chrome-root.desktop;
+x-scheme-handler/http=google-chrome-root.desktop;
+x-scheme-handler/https=google-chrome-root.desktop;

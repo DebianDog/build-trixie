@@ -1,0 +1,4 @@
+#!/bin/sh
+
+gpg --keyserver pgpkeys.mit.edu --recv-key  07DC563D1F41B907
+gpg -a --export 07DC563D1F41B907 | sudo apt-key add -

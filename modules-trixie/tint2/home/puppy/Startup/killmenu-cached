@@ -1,0 +1,7 @@
+#!/bin/bash
+
+WM=$(wmctrl -m | grep Name: | awk '{ print $2 }')
+if [ "$WM" = "Openbox" ]; then
+rm -f $HOME/.cache/menus/*
+pkill menu-cached
+fi

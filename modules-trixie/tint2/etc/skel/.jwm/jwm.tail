@@ -1,0 +1,196 @@
+      <Separator/>
+<Menu label="Shutdown" icon="shutdown.png" height="16">
+      <Program icon="lock.png" label="Lock">
+         xscreensaver-command -activate
+      </Program>
+      <Separator/>
+      <Restart label="Restart WM" icon="switch.png"/>
+      <Exit label="Exit WM" confirm="true" icon="logout.png"/>
+      <Program label="Reboot" confirm="false" icon="restart.png">wmreboot</Program>
+      <Program label="Shutdown" confirm="false" icon="shutdown.png">wmpoweroff</Program>
+      <Program label="Suspend" confirm="false" icon="suspend.png">pm-suspend</Program>
+</Menu>
+   
+   </RootMenu>
+
+   <Group>
+      <Class>Pidgin</Class>
+      <Option>sticky</Option>
+   </Group>
+
+   <Group>
+      <Name>gkrellm</Name>
+      <Option>nolist</Option>
+      <Option>sticky</Option>
+   </Group>
+
+   <Group>
+      <Name>xterm</Name>
+      <Option>vmax</Option>
+      <Option>icon:terminal.png</Option>
+   </Group>
+
+   <!-- Additional tray attributes: autohide, width, border, layer, layout -->
+    <Tray x="0" y="-1" height="25" autohide="off">
+
+      <!-- Additional TrayButton attribute: label -->
+      <!--      <TrayButton label="JWM">root:1</TrayButton> -->
+        <TrayButton label="Menu" icon="other.png">root:1</TrayButton>  
+      
+<!--   <TrayButton label="_">showdesktop</TrayButton> --> 
+       <Spacer width="2"/>
+        <TrayButton label="_">showdesktop</TrayButton>
+        <Spacer width="2"/>
+
+        <Pager labeled="true"/>            
+      
+      <TaskList maxwidth="256"/>
+
+      <Dock/>
+
+      <!-- Additional Swallow attribute: height -->
+      <Swallow name="xload" width="64">
+         xload -nolabel -bg black -fg red -hl white
+      </Swallow>
+
+      <Clock format="%H:%M">xclock</Clock>
+
+   </Tray>
+
+   <!-- Visual Styles -->
+
+   <WindowStyle>
+
+    <Font>DejaVu Sans  -10</Font>
+    <Width>3</Width>
+    <Height>22</Height>     
+    
+      <Active>
+         <Text>#F0F8FF</Text>
+<!-- #DEBIAN
+         <Title>#70849d:#2e3a67</Title>
+-->
+         <Title>#5F9EA0:#36648B</Title>
+         <Outline>#000000</Outline>
+         <Opacity>1.0</Opacity>
+      </Active>
+
+      <Inactive>
+         <Text>#9FB6CD</Text>
+         <Title>#696969:#000000</Title>
+         <Outline>#000000</Outline>
+         <Opacity>0.5:0.9:0.1</Opacity>
+      </Inactive>
+
+   </WindowStyle>
+   
+<TaskListStyle>
+   <Font>DejaVu Sans  -10</Font>
+   <ActiveForeground>#BBFFFF</ActiveForeground>
+   <ActiveBackground>#008080:#000000</ActiveBackground>
+   <Background>#696969:#000000</Background>
+</TaskListStyle>
+
+   <!-- Additional TrayStyle attribute: insert -->
+    <TrayStyle group="true" list="all">
+        <Font>Sans-10</Font>
+        <Background>#333333</Background>
+        <Foreground>#FFFFFF</Foreground>
+        <Outline>#000000</Outline>
+        <Opacity>0.75</Opacity>
+    </TrayStyle>
+
+<PagerStyle>
+   <Outline>#B0E2FF</Outline>
+   <Foreground>#282828</Foreground>
+   <Background>grey50</Background>
+   <ActiveForeground>#808A87</ActiveForeground>
+   <ActiveBackground>#282828</ActiveBackground>
+</PagerStyle>
+
+<MenuStyle>
+   <Font>Oxygen  -11</Font>
+   <Foreground>#B2DFEE</Foreground>
+   <Background>#1E1E1E</Background>
+   <ActiveForeground>#FFE1FF</ActiveForeground>
+   <ActiveBackground>#00E5EE:#000000</ActiveBackground>
+</MenuStyle>
+
+   <PopupStyle enabled="true">
+   <Font>DejaVu Sans  -10</Font>
+   <Outline>#000000</Outline>
+   <Foreground>#00FFFF</Foreground>
+   <Background>#000000</Background>
+</PopupStyle>
+
+    
+  <!-- <Icons> --> 
+      <IconPath> $HOME/.icons</IconPath>
+      <IconPath>/usr/share/pixmaps</IconPath>
+      <IconPath>/usr/share/icons/hicolor/24x24/apps</IconPath>
+      <IconPath>/usr/local/bin</IconPath>
+<!-- </Icons> -->
+
+   <!-- Number of virtual desktops -->
+   <Desktops  width="4" height="1">
+    <Desktop Name="One">
+     <Background type="command">desktop.ctrl 1</Background>
+    </Desktop>
+    <Desktop Name="Two">
+     <Background type="command">desktop.ctrl 2</Background>
+    </Desktop>
+    <Desktop Name="Three">
+     <Background type="command">desktop.ctrl 3</Background>
+    </Desktop>
+    <Desktop Name="Four">
+     <Background type="command">desktop.ctrl 4</Background>
+    </Desktop>
+   </Desktops>
+
+   <!-- Double click speed (in milliseconds) -->
+   <DoubleClickSpeed>400</DoubleClickSpeed>
+
+   <!-- Double click delta (in pixels) -->
+   <DoubleClickDelta>2</DoubleClickDelta>
+
+   <!-- The focus model (sloppy or click) -->
+   <FocusModel>click</FocusModel>
+
+   <!-- The snap mode (none, screen, or border) -->
+   <SnapMode distance="10">border</SnapMode>
+
+   <!-- The move mode (outline or opaque) -->
+   <MoveMode>opaque</MoveMode>
+
+   <!-- The resize mode (outline or opaque) -->
+   <ResizeMode>opaque</ResizeMode>
+
+   <StartupCommand></StartupCommand>
+
+   <!-- Key bindings -->
+   <Key key="Up">up</Key>
+   <Key key="Down">down</Key>
+   <Key key="Right">right</Key>
+   <Key key="Left">left</Key>
+   <Key key="h">left</Key>
+   <Key key="j">down</Key>
+   <Key key="k">up</Key>
+   <Key key="l">right</Key>
+   <Key key="Return">select</Key>
+   <Key key="Escape">escape</Key>
+   <Key key="Print">exec: scrotdlg</Key>  
+   <Key key="XF86PowerOff">exec: power-button</Key>
+
+   <Key mask="A" key="Tab">next</Key>
+   <Key mask="A" key="F4">close</Key>
+   <Key mask="A" key="#">desktop#</Key>
+   <Key mask="A" key="F1">root:1</Key>
+   <Key mask="A" key="F2">window</Key>
+   <Key mask="A" key="F10">maximize</Key>
+<!-- <Key mask="A" key="Right">rdesktop</Key> --> 
+<!-- <Key mask="A" key="Left">ldesktop</Key> --> 
+   <Key mask="A" key="Up">udesktop</Key>
+   <Key mask="A" key="Down">ddesktop</Key>
+
+</JWM>
+
