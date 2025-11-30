@@ -1,5 +1,7 @@
 ## build-trixie
-### Create a Debian trixie minimal live system similar to 'DebianDog'    
+### Create a Debian trixie minimal live system similar to 'DebianDog'
+
+See more info about usage and changes/fixes at https://forum.puppylinux.com/viewtopic.php?p=159033#p159033    
 
 #### Update 2025-11-29:    
 Added "extra-commands" script, will run inside chroot, based on the idea of @IdfbAn          
