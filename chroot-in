@@ -104,6 +104,9 @@ umount -l "$LAUNCHDIR"/trixie/chroot/dev/pts
 umount -l "$LAUNCHDIR"/trixie/chroot/dev
 umount -l "$LAUNCHDIR"/trixie/chroot/sys
 
+rm "$LAUNCHDIR"/trixie/chroot/etc/resolv.conf
+touch "$LAUNCHDIR"/trixie/chroot/etc/resolv.conf
+
 echo -e "\e[0;32mOkay, exited the chroot now\033[0m"
 sleep 4
 if mountpoint -q "$LAUNCHDIR/trixie/chroot/proc"; then
