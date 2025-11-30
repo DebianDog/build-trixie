@@ -1,0 +1,139 @@
+#!/bin/bash
+
+export LAUNCHDIR="$(dirname "$(readlink -f "$0")")"
+
+if [ -z $(which gxmessage) ]; then
+MESSAGE=xmessage
+else
+MESSAGE=gxmessage
+fi
+
+# Not running from terminal ?
+tty -s;
+if [ $? -ne 0 ]; then
+msg=" Please run this program from terminal\n
+./$(basename $0)
+"
+	$MESSAGE "`echo -e $msg`"
+	exit 0
+fi
+
+if [ "`whoami`" != "root" ]; then
+echo "This script should be run as root"
+echo "Please run again, e.g. 'sudo ./$(basename $0) <config>', exiting now..."
+sleep 3
+exit
+fi
+
+# This makes sure when the script is interrupted, that all mount 'binds' will unmount 
+exitfn () {
+    trap SIGINT              # Resore signal handling for SIGINT
+echo -e "\e[0;36mUnmounting mount binds in chroot\033[0m"
+#umount -l chroot/tmp
+umount -l "$LAUNCHDIR"/trixie/chroot/proc 2> /dev/null
+umount -l "$LAUNCHDIR"/trixie/chroot/sys 2> /dev/null
+umount -l "$LAUNCHDIR"/trixie/chroot/dev/pts 2> /dev/null
+umount -l "$LAUNCHDIR"/trixie/chroot/dev 2> /dev/null
+
+exit
+}
+export -f exitfn
+
+trap "exitfn" 1 2 3 15           # Set up SIGINT trap to call function 'exitfn'
+
+############ Start ############
+
+echo ---------------------------------------------------------------
+echo -e "\e[0;33mThe purpose of this is to modify the chroot AFTER a build is made\033[0m"
+echo ---------------------------------------------------------------
+
+echo -e "\e[0;33mSo you can, for example, install more packages or run some commands\033[0m"
+echo -e "\e[0;33mWhen done, type:\033[0m" exit
+echo -e "\e[0;33mAnd you'll be prompted to make a new 01-filesystem.squashfs\033[0m"
+echo
+echo -e "\e[0;32mChecking if chroot directory exist in trixie folder...\033[0m"
+if [ -d "$LAUNCHDIR"/trixie/chroot/dev ]; then
+read -p "The chroot directory exists, continue? (Enter=yes) (Y/n)?" choice
+case "$choice" in 
+  y|Y|"")
+echo -e "\e[0;32mStart running in chroot environment now...\033[0m"
+echo -e "\e[0;32mType or paste your commands, e.g.\033[0m" apt install somepackage
+echo -e "\e[0;32mAlso you can run synaptic, by typing:\033[0m" synaptic
+echo -e "\e[0;33mWhen done (close any applications first), type:\033[0m" exit
+;;
+  n|N)
+echo "Exiting..."
+sleep 3
+exit 0
+;;
+  *)
+echo -e "\e[0;31mNot a valid choice, exiting....\033[0m"
+sleep 3
+exit 0
+;;
+esac
+
+else
+echo -e "\e[0;31mThe chroot directory does not exist\nExiting...\033[0m"
+exit
+fi
+
+# mount bind some required directories from host filesystem
+mount --bind /proc "$LAUNCHDIR"/trixie/chroot/proc
+#mount --bind /tmp "$LAUNCHDIR"/trixie/chroot/tmp
+mount --bind /dev "$LAUNCHDIR"/trixie/chroot/dev
+mount --bind /sys "$LAUNCHDIR"/trixie/chroot/sys
+mount -t devpts devpts "$LAUNCHDIR"/trixie/chroot/dev/pts
+# provide a network connection in chroot
+echo -en "`cat /etc/resolv.conf`" > "$LAUNCHDIR"/trixie/chroot/etc/resolv.conf
+
+if [ "$(which chroot)" = "/bin/chroot" ]; then
+CHROOT="/usr/sbin/chroot"
+else
+CHROOT="chroot"
+fi
+
+$CHROOT "$LAUNCHDIR"/trixie/chroot
+
+sleep 2
+
+echo -e "\e[0;36mUnmounting mount binds in chroot\033[0m"
+#umount -l "$LAUNCHDIR"/trixie/chroot/tmp
+umount -l "$LAUNCHDIR"/trixie/chroot/proc
+umount -l "$LAUNCHDIR"/trixie/chroot/dev/pts
+umount -l "$LAUNCHDIR"/trixie/chroot/dev
+umount -l "$LAUNCHDIR"/trixie/chroot/sys
+
+echo -e "\e[0;32mOkay, exited the chroot now\033[0m"
+sleep 4
+if mountpoint -q "$LAUNCHDIR/trixie/chroot/proc"; then
+umount -l "$LAUNCHDIR"/trixie/chroot/proc 2> /dev/null # try unmounting proc again if failed earlier (may happen on EasyOs)
+  if [ $? -ne 0 ]; then # exit if failed unmounting proc
+  echo -e "\e[0;31mFailed unmounting all mount binds, exiting ...\033[0m"
+  exitfn
+  fi
+fi
+
+echo -e "\e[0;32mNow you can make a new 01-filesystem.squashfs in this directory: \033[0m"
+echo -e "\e[0;32m$LAUNCHDIR\033[0m"
+echo -e "\e[0;32mThe /var/cache/apt/archives directory (containing .deb pkgs) will be excluded\033[0m"
+read -p "Create 01-filesystem.squashfs (gzip compressed) ? (Enter=yes) (Y/n)?" choice
+case "$choice" in 
+  y|Y|"") 
+mksquashfs "$LAUNCHDIR"/trixie/chroot "$LAUNCHDIR"/01-filesystem.squashfs -comp gzip -e var/cache/apt/archives
+;;
+  n|N)
+echo "Exiting..."
+sleep 3
+exit 0
+;;
+  *)
+echo -e "\e[0;31mNot a valid choice, exiting....\033[0m"
+sleep 3
+exit 0
+;;
+esac
+
+echo "Done!"
+
+
