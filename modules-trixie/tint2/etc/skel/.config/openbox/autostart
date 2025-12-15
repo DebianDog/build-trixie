@@ -1,13 +1,7 @@
 #!/bin/sh
 export XDG_CURRENT_DESKTOP=OPENBOX
 SET_DESKTOP=$(readlink -f $HOME/.config/openbox/set-desktop)
-if [ "$SET_DESKTOP" != "$HOME/.config/openbox/pcman" ]; then
-# Pre-load menu
-xdotool mousemove 0 0
-xdotool key ctrl+alt+space
-xdotool mousemove 300 300
-openbox --reconfigure
-fi
+
 [ $(pidof pcmanfm) ] && killall -9 pcmanfm
 
 # Provides the desktop of choice, e.g. tint2 left icon panel or rox pinboard
@@ -24,6 +18,14 @@ parcellite &
 #wicd-gtk --tray &
 
 #volumeicon &
+
+if [ "$SET_DESKTOP" != "$HOME/.config/openbox/pcman" ]; then
+# Pre-load menu
+xdotool mousemove 0 0
+xdotool key ctrl+alt+space
+xdotool mousemove 300 300
+openbox --reconfigure
+fi
 
 #desktop_drive_icons &
 sleep 6
