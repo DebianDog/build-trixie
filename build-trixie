@@ -457,13 +457,13 @@ deb http://deb.debian.org/debian trixie main contrib non-free non-free-firmware
 
 '$DEVUANREPO'
 
-#deb http://deb.debian.org/debian trixie-updates main contrib non-free
+deb http://deb.debian.org/debian trixie-updates main contrib non-free
 #deb-src http://deb.debian.org/debian trixie-updates main contrib non-free
 
 #deb http://deb.debian.org/debian trixie-proposed-updates main contrib non-free
 #deb-src http://deb.debian.org/debian trixie-proposed-updates main contrib non-free
 
-#deb http://security.debian.org trixie-security main contrib non-free
+deb http://security.debian.org trixie-security main contrib non-free
 #deb-src http://security.debian.org trixie-security main contrib non-free
 
 '$SNAPSHOT'
@@ -478,13 +478,13 @@ deb http://deb.debian.org/debian trixie main contrib non-free non-free-firmware
 
 '$DEVUANREPO'
 
-#deb http://deb.debian.org/debian trixie-updates main contrib non-free
+deb http://deb.debian.org/debian trixie-updates main contrib non-free
 #deb-src http://deb.debian.org/debian trixie-updates main contrib non-free
 
 #deb http://deb.debian.org/debian trixie-proposed-updates main contrib non-free
 #deb-src http://deb.debian.org/debian trixie-proposed-updates main contrib non-free
 
-#deb http://security.debian.org trixie-security main contrib non-free
+deb http://security.debian.org trixie-security main contrib non-free
 #deb-src http://security.debian.org trixie-security main contrib non-free
 
 '$SNAPSHOT'
